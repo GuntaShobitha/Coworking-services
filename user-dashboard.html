@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dashboard — STACKLY</title>
+<link rel="icon" href="/favicon.ico" />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+
+<button class="dash-toggle" onclick="document.querySelector('.dash-side').classList.toggle('open')">☰</button>
+
+<div class="dash">
+  <aside class="dash-side">
+    <div class="logo"><a href="/index.html"><img src="/images/logo-dark.webp" alt="Stackly" /></a></div>
+    <ul class="dash-nav">
+      <li><a href="#" class="active"><span class="ico">◐</span> Overview</a></li>
+      <li><a href="#bookings"><span class="ico">▤</span> My Bookings</a></li>
+      <li><a href="#rooms"><span class="ico">▣</span> Meeting Rooms</a></li>
+      <li><a href="#events"><span class="ico">✦</span> Events</a></li>
+      <li><a href="#billing"><span class="ico">◈</span> Billing</a></li>
+      <li><a href="#profile"><span class="ico">◉</span> Profile</a></li>
+      <li><a href="#settings"><span class="ico">⚙</span> Settings</a></li>
+    </ul>
+    <div class="logout"><a href="/login.html">↪ Log out</a></div>
+  </aside>
+
+  <main class="dash-main">
+    <div class="dash-topbar">
+      <div>
+        <div class="crumb" style="color:var(--accent-2); margin-bottom:6px;">User · Dashboard</div>
+        <h1>Welcome back, Elena.</h1>
+      </div>
+      <div class="dash-user"><img src="/images/person-1.webp" alt="You" /><div><strong style="display:block;">Elena Rossi</strong><small style="color:var(--muted);">Dedicated Desk · SF</small></div></div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi"><div class="label">Hours this week</div><div class="value">32</div><div class="delta">+12% vs last</div></div>
+      <div class="kpi"><div class="label">Rooms Booked</div><div class="value">4</div><div class="delta">This month</div></div>
+      <div class="kpi"><div class="label">Guest Visits</div><div class="value">7</div><div class="delta">+2 this week</div></div>
+      <div class="kpi"><div class="label">Credits Left</div><div class="value">18</div><div class="delta">of 24 hrs</div></div>
+    </div>
+
+    <div class="panel" id="bookings">
+      <h2>Upcoming Bookings</h2>
+      <div class="panel-row"><span>Meeting Room · Oak</span><span>Tue 10:00 – 11:00</span><span class="tag ok">Confirmed</span></div>
+      <div class="panel-row"><span>Phone Booth · 3</span><span>Wed 14:00 – 14:30</span><span class="tag ok">Confirmed</span></div>
+      <div class="panel-row"><span>Studio A</span><span>Fri 16:00 – 18:00</span><span class="tag warn">Pending</span></div>
+      <div class="panel-row"><span>Event Space</span><span>Sat 19:00 – 22:00</span><span class="tag ok">Confirmed</span></div>
+    </div>
+
+    <div class="panel" id="events">
+      <h2>Upcoming Events</h2>
+      <div class="panel-row"><span>Wednesday Workshop: Design Critique</span><span>Wed 18:00</span><a href="#" style="color:var(--accent-2);">RSVP</a></div>
+      <div class="panel-row"><span>Members Dinner</span><span>Fri 20:00</span><a href="#" style="color:var(--accent-2);">RSVP</a></div>
+      <div class="panel-row"><span>Morning Yoga</span><span>Sat 08:00</span><a href="#" style="color:var(--accent-2);">RSVP</a></div>
+    </div>
+
+    <div class="panel" id="billing">
+      <h2>Recent Invoices</h2>
+      <div class="panel-row"><span>March 2026</span><span>$399.00</span><span class="tag ok">Paid</span></div>
+      <div class="panel-row"><span>February 2026</span><span>$399.00</span><span class="tag ok">Paid</span></div>
+      <div class="panel-row"><span>January 2026</span><span>$399.00</span><span class="tag ok">Paid</span></div>
+    </div>
+  </main>
+</div>
+<script src="/js/main.js"></script>
+</body></html>

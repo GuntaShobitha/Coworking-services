@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin — STACKLY</title>
+<link rel="icon" href="/favicon.ico" />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+
+<button class="dash-toggle" onclick="document.querySelector('.dash-side').classList.toggle('open')">☰</button>
+
+<div class="dash">
+  <aside class="dash-side">
+    <div class="logo"><a href="/index.html"><img src="/images/logo-dark.webp" alt="Stackly" /></a></div>
+    <ul class="dash-nav">
+      <li><a href="#" class="active"><span class="ico">◐</span> Overview</a></li>
+      <li><a href="#members"><span class="ico">◉</span> Members</a></li>
+      <li><a href="#locations"><span class="ico">◈</span> Locations</a></li>
+      <li><a href="#bookings"><span class="ico">▤</span> Bookings</a></li>
+      <li><a href="#revenue"><span class="ico">▣</span> Revenue</a></li>
+      <li><a href="#events"><span class="ico">✦</span> Events</a></li>
+      <li><a href="#reports"><span class="ico">≡</span> Reports</a></li>
+      <li><a href="#settings"><span class="ico">⚙</span> Settings</a></li>
+    </ul>
+    <div class="logout"><a href="/login.html">↪ Log out</a></div>
+  </aside>
+
+  <main class="dash-main">
+    <div class="dash-topbar">
+      <div>
+        <div class="crumb" style="color:var(--accent-2); margin-bottom:6px;">Admin · Dashboard</div>
+        <h1>Operations Overview</h1>
+      </div>
+      <div class="dash-user"><img src="/images/person-2.webp" alt="Admin" /><div><strong style="display:block;">James Whitaker</strong><small style="color:var(--muted);">Head of Community</small></div></div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi"><div class="label">Total Members</div><div class="value">854</div><div class="delta">+18 this month</div></div>
+      <div class="kpi"><div class="label">Occupancy</div><div class="value">87%</div><div class="delta">+4% vs last</div></div>
+      <div class="kpi"><div class="label">MRR</div><div class="value">$342k</div><div class="delta">+6.2%</div></div>
+      <div class="kpi"><div class="label">Open Tickets</div><div class="value">12</div><div class="delta">−3 today</div></div>
+    </div>
+
+    <div class="panel" id="members">
+      <h2>Recent Members</h2>
+      <div class="panel-row"><span>Elena Rossi</span><span>Dedicated · SF</span><span class="tag ok">Active</span></div>
+      <div class="panel-row"><span>James Whitaker</span><span>Office · NY</span><span class="tag ok">Active</span></div>
+      <div class="panel-row"><span>Aya Nakamura</span><span>Hot Desk · LDN</span><span class="tag warn">Trial</span></div>
+      <div class="panel-row"><span>Marcus Lee</span><span>Office · SF</span><span class="tag bad">Overdue</span></div>
+    </div>
+
+    <div class="panel" id="locations">
+      <h2>Locations at a Glance</h2>
+      <div class="panel-row"><span>San Francisco · Vine St</span><span>92% occupied</span><span class="tag ok">Healthy</span></div>
+      <div class="panel-row"><span>New York · SoHo</span><span>88% occupied</span><span class="tag ok">Healthy</span></div>
+      <div class="panel-row"><span>London · Shoreditch</span><span>81% occupied</span><span class="tag warn">Watch</span></div>
+    </div>
+
+    <div class="panel" id="revenue">
+      <h2>Revenue Breakdown</h2>
+      <div class="panel-row"><span>Memberships</span><span>$268,400</span><span>78%</span></div>
+      <div class="panel-row"><span>Meeting Rooms</span><span>$42,100</span><span>12%</span></div>
+      <div class="panel-row"><span>Events</span><span>$21,800</span><span>7%</span></div>
+      <div class="panel-row"><span>Other</span><span>$9,900</span><span>3%</span></div>
+    </div>
+  </main>
+</div>
+<script src="/js/main.js"></script>
+</body></html>
