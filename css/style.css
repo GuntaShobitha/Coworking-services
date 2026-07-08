@@ -39,7 +39,7 @@ h2 { font-size: clamp(1.8rem, 4vw, 3.2rem); }
 h3 { font-size: clamp(1.3rem, 2.2vw, 1.75rem); }
 p { color: var(--ink-2); }
 
-.container { max-width: 1240px; margin: 0 auto; padding: 0 28px; }
+.container { max-width: 1240px; margin: 0 auto; padding: 20px; }
 .section { padding: 0px; position: relative; }
 .section.tight { padding: 70px 0; }
 .eyebrow {
@@ -424,7 +424,106 @@ p { color: var(--ink-2); }
 .price-card.featured li { border-color: rgba(255,255,255,.1); } */
 
 /* Pricing Section */
-.dark-sec{
+
+
+/* =========================
+   Responsive Pricing
+========================= */
+
+/* Tablet */
+@media (max-width: 992px) {
+
+    .pricing-grid{
+        grid-template-columns: repeat(2,1fr);
+        gap: 24px;
+    }
+
+    .price-card{
+        padding: 40px 30px;
+    }
+
+    .price{
+        font-size: 3rem;
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px){
+
+    .pricing-grid{
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .price-card{
+        padding: 35px 25px;
+        border-radius: 20px;
+    }
+
+    .price-card h3{
+        font-size: 1.5rem;
+    }
+
+    .price{
+        font-size: 2.6rem;
+    }
+
+    .price small{
+        font-size: .95rem;
+    }
+
+    .price-card li{
+        font-size: .95rem;
+        padding: 10px 0;
+    }
+
+    .price-card .badge{
+        top: 15px;
+        right: 15px;
+        padding: 6px 12px;
+        font-size: .65rem;
+    }
+
+    .price-card .btn{
+        width: 100%;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 480px){
+
+    .container{
+        padding: 0 20px;
+    }
+
+    .pricing-grid{
+        gap: 16px;
+    }
+
+    .price-card{
+        padding: 28px 20px;
+    }
+
+    .price-card h3{
+        font-size: 1.3rem;
+    }
+
+    .price{
+        font-size: 2.2rem;
+    }
+
+    .price-card li{
+        font-size: .9rem;
+    }
+
+    .price-card .badge{
+        font-size: .6rem;
+        padding: 5px 10px;
+    }
+}
+
+
+/* .dark-sec{
     background: linear-gradient(135deg, #0f172a 0%, #111827 50%, #1e293b 100%);
     position: relative;
     overflow: hidden;
@@ -495,6 +594,16 @@ p { color: var(--ink-2); }
     box-shadow: 0 20px 60px rgba(124,58,237,.35);
 }
 
+.price-card{
+    background: rgba(255,255,255,.06);
+    backdrop-filter: blur(30px) saturate(180%);
+    -webkit-backdrop-filter: blur(30px) saturate(180%);
+    border: 1px solid rgba(255,255,255,.18);
+    box-shadow:
+        inset 0 1px rgba(255,255,255,.2),
+        0 20px 45px rgba(0,0,0,.35);
+}
+
 /* Badge */
 .price-card .badge{
     position: absolute;
@@ -542,7 +651,7 @@ p { color: var(--ink-2); }
 .price-card .btn{
     width: 100%;
     justify-content: center;
-}
+} */
 
 /* ---------- Testimonials ---------- */
 .testimonial {
