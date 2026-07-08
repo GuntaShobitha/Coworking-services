@@ -6,7 +6,57 @@
 <title>Admin — STACKLY</title>
 <link rel="icon" href="/favicon.ico" />
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="/css/style.css" />
+<link rel="stylesheet" href="./css/style.css" />
+
+<!--
+  Extra, ADDITIVE styles only.
+  Nothing in style.css is overridden or removed — this just teaches the
+  existing classes (.panel, .kpi, .tag, .panel-row, etc.) how to behave
+  as separate switchable "modules", and adds a couple of small new pieces
+  (settings form, bookings/events rows) that reuse the same design tokens
+  already defined in :root inside style.css.
+-->
+<style>
+  /* Each nav link now owns one <section class="dash-section">.
+     Only the active one is shown — this is what turns the single
+     "Overview" page into real, independent modules. */
+  .dash-section { display: none; }
+  .dash-section.active {
+    display: block;
+    animation: dashFadeIn .35s ease;
+  }
+  @keyframes dashFadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Small heading row reused at the top of every module */
+  .module-head { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 22px; }
+  .module-head h2 { font-size: 1.5rem; margin: 0; }
+  .module-sub { color: var(--muted); font-size: .85rem; }
+
+  /* Settings module form — same visual language as .panel */
+  .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 640px; }
+  @media (max-width: 700px) { .settings-grid { grid-template-columns: 1fr; } }
+  .field { display: flex; flex-direction: column; gap: 8px; }
+  .field label { font-size: .78rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  .field input {
+    padding: 12px 14px; border: 1px solid var(--line); border-radius: 4px;
+    font-family: var(--sans); font-size: .95rem; color: var(--ink); background: #fff;
+  }
+  .field input:focus { outline: none; border-color: var(--accent); }
+  .settings-save {
+    margin-top: 22px; padding: 12px 28px; background: var(--ink); color: #f5f0e8;
+    border-radius: 4px; font-size: .82rem; letter-spacing: .1em; text-transform: uppercase; font-weight: 600;
+    transition: background .3s var(--easing);
+  }
+  .settings-save:hover { background: var(--accent-2); }
+  .settings-msg { margin-top: 14px; font-size: .85rem; color: #2d7a3f; display: none; }
+  .settings-msg.show { display: block; }
+
+  /* Empty-state used by any module with no data yet */
+  .empty-state { padding: 30px 0; color: var(--muted); font-size: .9rem; text-align: center; }
+</style>
 </head>
 <body>
 
@@ -16,14 +66,14 @@
   <aside class="dash-side">
     <div class="logo"><a href="/index.html"><img src="/images/logo-dark.webp" alt="Stackly" /></a></div>
     <ul class="dash-nav">
-      <li><a href="#" class="active"><span class="ico">◐</span> Overview</a></li>
-      <li><a href="#members"><span class="ico">◉</span> Members</a></li>
-      <li><a href="#locations"><span class="ico">◈</span> Locations</a></li>
-      <li><a href="#bookings"><span class="ico">▤</span> Bookings</a></li>
-      <li><a href="#revenue"><span class="ico">▣</span> Revenue</a></li>
-      <li><a href="#events"><span class="ico">✦</span> Events</a></li>
-      <li><a href="#reports"><span class="ico">≡</span> Reports</a></li>
-      <li><a href="#settings"><span class="ico">⚙</span> Settings</a></li>
+      <li><a href="#overview" class="active" data-target="overview"><span class="ico">◐</span> Overview</a></li>
+      <li><a href="#members" data-target="members"><span class="ico">◉</span> Members</a></li>
+      <li><a href="#locations" data-target="locations"><span class="ico">◈</span> Locations</a></li>
+      <li><a href="#bookings" data-target="bookings"><span class="ico">▤</span> Bookings</a></li>
+      <li><a href="#revenue" data-target="revenue"><span class="ico">▣</span> Revenue</a></li>
+      <li><a href="#events" data-target="events"><span class="ico">✦</span> Events</a></li>
+      <li><a href="#reports" data-target="reports"><span class="ico">≡</span> Reports</a></li>
+      <li><a href="#settings" data-target="settings"><span class="ico">⚙</span> Settings</a></li>
     </ul>
     <div class="logout"><a href="/login.html">↪ Log out</a></div>
   </aside>
@@ -32,41 +82,275 @@
     <div class="dash-topbar">
       <div>
         <div class="crumb" style="color:var(--accent-2); margin-bottom:6px;">Admin · Dashboard</div>
-        <h1>Operations Overview</h1>
+        <h1 id="topbarTitle">Operations Overview</h1>
       </div>
-      <div class="dash-user"><img src="/images/person-2.webp" alt="Admin" /><div><strong style="display:block;">James Whitaker</strong><small style="color:var(--muted);">Head of Community</small></div></div>
+      <div class="dash-user" id="dashUser">
+        <img src="/images/person-2.webp" alt="Admin" />
+        <div>
+          <strong id="dashUserName" style="display:block;">James Whitaker</strong>
+          <small id="dashUserEmail" style="color:var(--muted);">Head of Community</small>
+        </div>
+      </div>
     </div>
 
-    <div class="kpi-grid">
-      <div class="kpi"><div class="label">Total Members</div><div class="value">854</div><div class="delta">+18 this month</div></div>
-      <div class="kpi"><div class="label">Occupancy</div><div class="value">87%</div><div class="delta">+4% vs last</div></div>
-      <div class="kpi"><div class="label">MRR</div><div class="value">$342k</div><div class="delta">+6.2%</div></div>
-      <div class="kpi"><div class="label">Open Tickets</div><div class="value">12</div><div class="delta">−3 today</div></div>
-    </div>
+    <!-- ======================= OVERVIEW MODULE ======================= -->
+    <section class="dash-section active" data-section="overview">
+      <div class="kpi-grid">
+        <div class="kpi"><div class="label">Total Members</div><div class="value">854</div><div class="delta">+18 this month</div></div>
+        <div class="kpi"><div class="label">Occupancy</div><div class="value">87%</div><div class="delta">+4% vs last</div></div>
+        <div class="kpi"><div class="label">MRR</div><div class="value">$342k</div><div class="delta">+6.2%</div></div>
+        <div class="kpi"><div class="label">Open Tickets</div><div class="value">12</div><div class="delta">−3 today</div></div>
+      </div>
 
-    <div class="panel" id="members">
-      <h2>Recent Members</h2>
-      <div class="panel-row"><span>Elena Rossi</span><span>Dedicated · SF</span><span class="tag ok">Active</span></div>
-      <div class="panel-row"><span>James Whitaker</span><span>Office · NY</span><span class="tag ok">Active</span></div>
-      <div class="panel-row"><span>Aya Nakamura</span><span>Hot Desk · LDN</span><span class="tag warn">Trial</span></div>
-      <div class="panel-row"><span>Marcus Lee</span><span>Office · SF</span><span class="tag bad">Overdue</span></div>
-    </div>
+      <div class="panel">
+        <h2>Recent Members</h2>
+        <div class="panel-row"><span>Elena Rossi</span><span>Dedicated · SF</span><span class="tag ok">Active</span></div>
+        <div class="panel-row"><span>James Whitaker</span><span>Office · NY</span><span class="tag ok">Active</span></div>
+        <div class="panel-row"><span>Aya Nakamura</span><span>Hot Desk · LDN</span><span class="tag warn">Trial</span></div>
+        <div class="panel-row"><span>Marcus Lee</span><span>Office · SF</span><span class="tag bad">Overdue</span></div>
+      </div>
 
-    <div class="panel" id="locations">
-      <h2>Locations at a Glance</h2>
-      <div class="panel-row"><span>San Francisco · Vine St</span><span>92% occupied</span><span class="tag ok">Healthy</span></div>
-      <div class="panel-row"><span>New York · SoHo</span><span>88% occupied</span><span class="tag ok">Healthy</span></div>
-      <div class="panel-row"><span>London · Shoreditch</span><span>81% occupied</span><span class="tag warn">Watch</span></div>
-    </div>
+      <div class="panel">
+        <h2>Locations at a Glance</h2>
+        <div class="panel-row"><span>San Francisco · Vine St</span><span>92% occupied</span><span class="tag ok">Healthy</span></div>
+        <div class="panel-row"><span>New York · SoHo</span><span>88% occupied</span><span class="tag ok">Healthy</span></div>
+        <div class="panel-row"><span>London · Shoreditch</span><span>81% occupied</span><span class="tag warn">Watch</span></div>
+      </div>
+    </section>
 
-    <div class="panel" id="revenue">
-      <h2>Revenue Breakdown</h2>
-      <div class="panel-row"><span>Memberships</span><span>$268,400</span><span>78%</span></div>
-      <div class="panel-row"><span>Meeting Rooms</span><span>$42,100</span><span>12%</span></div>
-      <div class="panel-row"><span>Events</span><span>$21,800</span><span>7%</span></div>
-      <div class="panel-row"><span>Other</span><span>$9,900</span><span>3%</span></div>
-    </div>
+    <!-- ======================= MEMBERS MODULE ======================= -->
+    <section class="dash-section" data-section="members">
+      <div class="module-head">
+        <h2>All Members</h2>
+        <span class="module-sub">854 total · 18 added this month</span>
+      </div>
+      <div class="panel">
+        <div class="panel-row"><span>Elena Rossi</span><span>Dedicated · SF</span><span class="tag ok">Active</span></div>
+        <div class="panel-row"><span>James Whitaker</span><span>Office · NY</span><span class="tag ok">Active</span></div>
+        <div class="panel-row"><span>Aya Nakamura</span><span>Hot Desk · LDN</span><span class="tag warn">Trial</span></div>
+        <div class="panel-row"><span>Marcus Lee</span><span>Office · SF</span><span class="tag bad">Overdue</span></div>
+        <div class="panel-row"><span>Priya Sharma</span><span>Hot Desk · NY</span><span class="tag ok">Active</span></div>
+        <div class="panel-row"><span>Tom Becker</span><span>Dedicated · LDN</span><span class="tag ok">Active</span></div>
+        <div class="panel-row"><span>Sofia Ibarra</span><span>Office · SF</span><span class="tag warn">Trial</span></div>
+      </div>
+    </section>
+
+    <!-- ======================= LOCATIONS MODULE ======================= -->
+    <section class="dash-section" data-section="locations">
+      <div class="module-head">
+        <h2>Locations</h2>
+        <span class="module-sub">3 active sites</span>
+      </div>
+      <div class="panel">
+        <div class="panel-row"><span>San Francisco · Vine St</span><span>92% occupied</span><span class="tag ok">Healthy</span></div>
+        <div class="panel-row"><span>New York · SoHo</span><span>88% occupied</span><span class="tag ok">Healthy</span></div>
+        <div class="panel-row"><span>London · Shoreditch</span><span>81% occupied</span><span class="tag warn">Watch</span></div>
+      </div>
+    </section>
+
+    <!-- ======================= BOOKINGS MODULE ======================= -->
+    <section class="dash-section" data-section="bookings">
+      <div class="module-head">
+        <h2>Bookings</h2>
+        <span class="module-sub">Meeting rooms & desks, next 7 days</span>
+      </div>
+      <div class="panel">
+        <div class="panel-row"><span>Elena Rossi</span><span>Meeting Room B · Today 2:00 PM</span><span class="tag ok">Confirmed</span></div>
+        <div class="panel-row"><span>Marcus Lee</span><span>Hot Desk 12 · Today 9:00 AM</span><span class="tag ok">Confirmed</span></div>
+        <div class="panel-row"><span>Aya Nakamura</span><span>Meeting Room A · Tomorrow 11:00 AM</span><span class="tag warn">Pending</span></div>
+        <div class="panel-row"><span>Tom Becker</span><span>Phone Booth 2 · Fri 3:30 PM</span><span class="tag ok">Confirmed</span></div>
+      </div>
+    </section>
+
+    <!-- ======================= REVENUE MODULE ======================= -->
+    <section class="dash-section" data-section="revenue">
+      <div class="module-head">
+        <h2>Revenue Breakdown</h2>
+        <span class="module-sub">This month · $342,200 total</span>
+      </div>
+      <div class="panel">
+        <div class="panel-row"><span>Memberships</span><span>$268,400</span><span>78%</span></div>
+        <div class="panel-row"><span>Meeting Rooms</span><span>$42,100</span><span>12%</span></div>
+        <div class="panel-row"><span>Events</span><span>$21,800</span><span>7%</span></div>
+        <div class="panel-row"><span>Other</span><span>$9,900</span><span>3%</span></div>
+      </div>
+    </section>
+
+    <!-- ======================= EVENTS MODULE ======================= -->
+    <section class="dash-section" data-section="events">
+      <div class="module-head">
+        <h2>Upcoming Events</h2>
+        <span class="module-sub">Community & member events</span>
+      </div>
+      <div class="panel">
+        <div class="panel-row"><span>Founders Breakfast</span><span>SF · Vine St · Thu 8:30 AM</span><span class="tag ok">Open</span></div>
+        <div class="panel-row"><span>Design Sprint Workshop</span><span>NY · SoHo · Sat 10:00 AM</span><span class="tag ok">Open</span></div>
+        <div class="panel-row"><span>Member Mixer</span><span>LDN · Shoreditch · Fri 6:00 PM</span><span class="tag warn">Almost Full</span></div>
+      </div>
+    </section>
+
+    <!-- ======================= REPORTS MODULE ======================= -->
+    <section class="dash-section" data-section="reports">
+      <div class="module-head">
+        <h2>Reports</h2>
+        <span class="module-sub">Generated summaries</span>
+      </div>
+      <div class="panel">
+        <div class="panel-row"><span>Monthly Occupancy Report</span><span>Jun 2026</span><span class="tag ok">Ready</span></div>
+        <div class="panel-row"><span>Revenue Summary</span><span>Jun 2026</span><span class="tag ok">Ready</span></div>
+        <div class="panel-row"><span>Churn & Retention</span><span>Q2 2026</span><span class="tag warn">Processing</span></div>
+      </div>
+    </section>
+
+    <!-- ======================= SETTINGS MODULE ======================= -->
+    <section class="dash-section" data-section="settings">
+      <div class="module-head">
+        <h2>Account Settings</h2>
+        <span class="module-sub">Synced with this browser's local storage</span>
+      </div>
+      <div class="panel">
+        <div class="settings-grid">
+          <div class="field">
+            <label for="settingsName">Full Name</label>
+            <input type="text" id="settingsName" placeholder="Your name" />
+          </div>
+          <div class="field">
+            <label for="settingsEmail">Email</label>
+            <input type="email" id="settingsEmail" placeholder="you@example.com" />
+          </div>
+        </div>
+        <button class="settings-save" id="settingsSave">Save Changes</button>
+        <div class="settings-msg" id="settingsMsg">Saved — your name and email were updated.</div>
+      </div>
+    </section>
+
   </main>
 </div>
+
 <script src="/js/main.js"></script>
+<script>
+(function () {
+  /* ---------------------------------------------------------------
+     1) MODULE SWITCHING
+     Every sidebar link now shows exactly one <section data-section>.
+     Nothing scrolls to an anchor anymore — it's a real module swap.
+  ----------------------------------------------------------------*/
+  var navLinks = document.querySelectorAll('.dash-nav a[data-target]');
+  var sections = document.querySelectorAll('.dash-section');
+  var topbarTitle = document.getElementById('topbarTitle');
+
+  var titles = {
+    overview: 'Operations Overview',
+    members: 'Members',
+    locations: 'Locations',
+    bookings: 'Bookings',
+    revenue: 'Revenue',
+    events: 'Events',
+    reports: 'Reports',
+    settings: 'Account Settings'
+  };
+
+  function showSection(name) {
+    sections.forEach(function (sec) {
+      sec.classList.toggle('active', sec.getAttribute('data-section') === name);
+    });
+    navLinks.forEach(function (link) {
+      link.classList.toggle('active', link.getAttribute('data-target') === name);
+    });
+    if (topbarTitle && titles[name]) topbarTitle.textContent = titles[name];
+
+    // Close the mobile sidebar after picking a module
+    var side = document.querySelector('.dash-side');
+    if (side) side.classList.remove('open');
+
+    // Keep the URL hash in sync without jumping the page
+    if (history.replaceState) {
+      history.replaceState(null, '', '#' + name);
+    }
+  }
+
+  navLinks.forEach(function (link) {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      showSection(link.getAttribute('data-target'));
+    });
+  });
+
+  // Land on whichever module the URL hash points to (defaults to overview)
+  var initial = window.location.hash ? window.location.hash.replace('#', '') : 'overview';
+  if (!titles[initial]) initial = 'overview';
+  showSection(initial);
+
+  /* ---------------------------------------------------------------
+     2) USER NAME + EMAIL FROM LOCAL STORAGE
+     Reads whatever the login page already stored, in a few common
+     shapes, so this keeps working regardless of how login.html
+     saves it:
+       - localStorage.user = '{"name": "...", "email": "..."}'
+       - localStorage.username / localStorage.name
+       - localStorage.email
+  ----------------------------------------------------------------*/
+  function readStoredUser() {
+    var name = null, email = null;
+
+    try {
+      var raw = localStorage.getItem('user');
+      if (raw) {
+        var u = JSON.parse(raw);
+        name = u.name || u.fullName || u.username || name;
+        email = u.email || email;
+      }
+    } catch (e) { /* not JSON, ignore */ }
+
+    name = name || localStorage.getItem('username') || localStorage.getItem('name');
+    email = email || localStorage.getItem('email');
+
+    return { name: name, email: email };
+  }
+
+  function applyUserToTopbar(name, email) {
+    var nameEl = document.getElementById('dashUserName');
+    var emailEl = document.getElementById('dashUserEmail');
+    if (name) nameEl.textContent = name;
+    if (email) emailEl.textContent = email;
+  }
+
+  var stored = readStoredUser();
+  applyUserToTopbar(stored.name, stored.email);
+
+  /* ---------------------------------------------------------------
+     3) SETTINGS FORM — edit + persist name/email back to localStorage
+  ----------------------------------------------------------------*/
+  var nameInput = document.getElementById('settingsName');
+  var emailInput = document.getElementById('settingsEmail');
+  var saveBtn = document.getElementById('settingsSave');
+  var msg = document.getElementById('settingsMsg');
+
+  nameInput.value = stored.name || '';
+  emailInput.value = stored.email || '';
+
+  saveBtn.addEventListener('click', function () {
+    var newName = nameInput.value.trim();
+    var newEmail = emailInput.value.trim();
+
+    if (newName) localStorage.setItem('username', newName);
+    if (newEmail) localStorage.setItem('email', newEmail);
+
+    // Also keep a combined "user" object in sync, in case other pages read that shape
+    try {
+      var existing = JSON.parse(localStorage.getItem('user') || '{}');
+      existing.name = newName || existing.name;
+      existing.email = newEmail || existing.email;
+      localStorage.setItem('user', JSON.stringify(existing));
+    } catch (e) {
+      localStorage.setItem('user', JSON.stringify({ name: newName, email: newEmail }));
+    }
+
+    applyUserToTopbar(newName, newEmail);
+
+    msg.classList.add('show');
+    setTimeout(function () { msg.classList.remove('show'); }, 2500);
+  });
+})();
+</script>
 </body></html>
