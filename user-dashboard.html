@@ -294,7 +294,7 @@ img{display:block;max-width:100%;height:auto}
       <a href="#events"    data-target="events"><span class="ico">✦</span><span>Events</span></a>
       <a href="#billing"   data-target="billing"><span class="ico">◈</span><span>Billing</span></a>
       <a href="#community" data-target="community"><span class="ico">◉</span><span>Community</span></a>
-      <a href="#profile"   data-target="profile"><span class="ico">☺</span><span>Profile</span></a>
+      <!-- <a href="#profile"   data-target="profile"><span class="ico">☺</span><span>Profile</span></a> -->
       <a href="#settings"  data-target="settings"><span class="ico">⚙</span><span>Settings</span></a>
     </nav>
 
@@ -475,25 +475,7 @@ img{display:block;max-width:100%;height:auto}
       </div>
     </section>
 
-    <!-- ================ PROFILE ================ -->
-    <section class="dash-section" data-section="profile">
-      <div class="panel">
-        <h3>Account details</h3>
-        <p class="desc">Your STACKLY member profile</p>
-        <div class="row"><strong>Name</strong><div class="mid" id="profName">—</div><div class="end"></div></div>
-        <div class="row"><strong>Email</strong><div class="mid" id="profEmail">—</div><div class="end"></div></div>
-        <div class="row"><strong>Membership</strong><div class="mid">Studio plan · Since Jan 2024</div><div class="end"><span class="tag ok">Active</span></div></div>
-        <div class="row"><strong>Home floor</strong><div class="mid">Level 2 · Quiet zone</div><div class="end"><span class="tag ok">Saved</span></div></div>
-      </div>
 
-      <div class="panel">
-        <h3>Preferences</h3>
-        <p class="desc">Personalise your experience</p>
-        <div class="row"><strong>Email notifications</strong><div class="mid">Bookings, events, invoices</div><div class="end"><span class="tag ok">On</span></div></div>
-        <div class="row"><strong>Calendar sync</strong><div class="mid">Google · connected</div><div class="end"><span class="tag ok">Active</span></div></div>
-        <div class="row"><strong>Two-factor auth</strong><div class="mid">Extra login security</div><div class="end"><span class="tag warn">Off</span></div></div>
-      </div>
-    </section>
 
     <!-- ================ SETTINGS ================ -->
     <section class="dash-section" data-section="settings">
@@ -575,7 +557,7 @@ const TITLES = {
   events   :{t:"Community events",        s:"Workshops, dinners, and gatherings this week.",            c:"Events"},
   billing  :{t:"Billing & plan",          s:"Invoices, credits, and payment methods.",                  c:"Billing"},
   community:{t:"The community",           s:"New faces, shared spaces, and what's on.",                 c:"Community"},
-  profile  :{t:"Your profile",            s:"How the rest of STACKLY sees you.",                        c:"Profile"},
+
   settings :{t:"Settings",                s:"Update your details and account preferences.",             c:"Settings"}
 };
 function showSection(name, first){
