@@ -83,7 +83,7 @@ function handleLogin(e){
   e.preventDefault();
   const role = document.getElementById('role').value;
   if(!role){ alert('Please select a role.'); return; }
-  window.location.href = role === 'admin' ? '/admin-dashboard.html' : '/user-dashboard.html';
+  window.location.href = role === 'admin' ? './admin-dashboard.html' : './user-dashboard.html';
 }
 function showRegister(e){ if(e) e.preventDefault(); hideAll(); document.getElementById('registerForm').style.display='block'; }
 function showForgot(e){ if(e) e.preventDefault(); hideAll(); document.getElementById('forgotForm').style.display='block'; }
