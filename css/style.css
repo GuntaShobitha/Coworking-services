@@ -124,6 +124,8 @@ p { color: var(--ink-2); }
   min-height: 100vh; display: flex; align-items: center; position: relative;
   color: #f5f0e8; overflow: hidden;
 }
+
+
 .hero-bg {
   position: absolute; inset: 0; z-index: 0;
   background-size: cover; background-position: center;
@@ -268,6 +270,98 @@ p { color: var(--ink-2); }
 .stats { display: flex; gap: 48px; margin-top: 36px; flex-wrap: wrap; }
 .stat-num { font-family: var(--serif); font-size: 3rem; color: var(--accent); line-height: 1; }
 .stat-label { font-size: .78rem; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
+
+
+.hero{
+    position:relative;
+    min-height:100vh;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    color:#fff;
+}
+
+.hero-carousel{
+    position:absolute;
+    inset:0;
+    overflow:hidden;
+    z-index:0;
+}
+
+.hero-slide{
+    position:absolute;
+    inset:0;
+    background-size:cover;
+    background-position:center;
+    opacity:0;
+    transform:scale(1.08);
+    transition:opacity 1.5s ease, transform 8s ease;
+}
+
+.hero-slide.active{
+    opacity:1;
+    transform:scale(1);
+}
+
+.hero-slide::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:linear-gradient(
+        rgba(0,0,0,.45),
+        rgba(0,0,0,.65)
+    );
+}
+
+/* GRID */
+
+.grid-overlay{
+    position:absolute;
+    inset:0;
+    display:grid;
+    grid-template-columns:repeat(16,1fr);
+    grid-template-rows:repeat(9,1fr);
+    pointer-events:none;
+    z-index:5;
+}
+
+.grid-box{
+    background:#111;
+    opacity:1;
+    transform:scale(1);
+    transition:
+        opacity .7s ease,
+        transform .7s ease;
+}
+
+.grid-box.hide{
+    opacity:0;
+    transform:scale(.2);
+}
+
+.hero-inner{
+    position:relative;
+    z-index:10;
+}
+
+@media(max-width:992px){
+
+.grid-overlay{
+    grid-template-columns:repeat(12,1fr);
+    grid-template-rows:repeat(7,1fr);
+}
+
+}
+
+@media(max-width:768px){
+
+.grid-overlay{
+    grid-template-columns:repeat(8,1fr);
+    grid-template-rows:repeat(6,1fr);
+}
+
+}
+
 
 /* ---------- Marquee ---------- */
 .marquee {

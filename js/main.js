@@ -60,3 +60,89 @@
     dashToggle.addEventListener('click', () => dashSide.classList.toggle('open'));
   }
 })();
+
+
+const slides = document.querySelectorAll(".hero-slide");
+const overlay = document.querySelector(".grid-overlay");
+
+let current = 0;
+
+// Create Grid
+function createGrid(){
+
+    overlay.innerHTML="";
+
+    let cols = 16;
+    let rows = 9;
+
+    if(window.innerWidth < 992){
+        cols = 12;
+        rows = 7;
+    }
+
+    if(window.innerWidth < 768){
+        cols = 8;
+        rows = 6;
+    }
+
+    overlay.style.gridTemplateColumns=`repeat(${cols},1fr)`;
+    overlay.style.gridTemplateRows=`repeat(${rows},1fr)`;
+
+    const total = cols * rows;
+
+    for(let i=0;i<total;i++){
+
+        const box=document.createElement("div");
+        box.className="grid-box";
+
+        overlay.appendChild(box);
+
+    }
+
+}
+
+createGrid();
+
+window.addEventListener("resize",createGrid);
+
+function animateGrid(){
+
+    const boxes=document.querySelectorAll(".grid-box");
+
+    boxes.forEach(box=>{
+
+        box.classList.remove("hide");
+
+    });
+
+    boxes.forEach(box=>{
+
+        const delay=Math.random()*700;
+
+        setTimeout(()=>{
+
+            box.classList.add("hide");
+
+        },delay);
+
+    });
+
+}
+
+function changeSlide(){
+
+    animateGrid();
+
+    setTimeout(()=>{
+
+        slides[current].classList.remove("active");
+
+        current=(current+1)%slides.length;
+
+        slides[current].classList.add("active");
+
+    },450);
+
+}
+
+setInterval(changeSlide,5000);
