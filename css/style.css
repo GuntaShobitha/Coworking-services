@@ -40,7 +40,7 @@ h3 { font-size: clamp(1.3rem, 2.2vw, 1.75rem); }
 p { color: var(--ink-2); }
 
 .container { max-width: 1240px; margin: 0 auto; padding: 0 28px; }
-.section { padding: 110px 0; position: relative; }
+.section { padding: 0px; position: relative; }
 .section.tight { padding: 70px 0; }
 .eyebrow {
   display: inline-block; font-size: .78rem; letter-spacing: .28em;
