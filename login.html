@@ -6,7 +6,7 @@
 <title>Login — STACKLY</title>
 <link rel="icon" href="/favicon.ico" />
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="/css/style.css" />
+<link rel="stylesheet" href="./css/style.css" />
 </head>
 <body>
 
@@ -20,8 +20,8 @@
   </aside>
   <div class="login-form-wrap">
     <div class="login-top">
-      <a href="/index.html"><img src="/images/logo-dark.webp" alt="STACKLY" /></a>
-      <a href="/index.html" class="back-link">← Back to Home</a>
+      <a href="./index.html"><img src="./images/logo-dark.webp" alt="STACKLY" /></a>
+      <a href="./index.html" class="back-link">← Back to Home</a>
     </div>
 
     <!-- LOGIN -->
@@ -83,7 +83,7 @@ function handleLogin(e){
   e.preventDefault();
   const role = document.getElementById('role').value;
   if(!role){ alert('Please select a role.'); return; }
-  window.location.href = role === 'admin' ? '/admin-dashboard.html' : '/user-dashboard.html';
+  window.location.href = role === 'admin' ? './admin-dashboard.html' : './user-dashboard.html';
 }
 function showRegister(e){ if(e) e.preventDefault(); hideAll(); document.getElementById('registerForm').style.display='block'; }
 function showForgot(e){ if(e) e.preventDefault(); hideAll(); document.getElementById('forgotForm').style.display='block'; }

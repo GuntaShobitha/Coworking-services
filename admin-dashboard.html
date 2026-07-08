@@ -75,7 +75,18 @@
       <li><a href="#reports" data-target="reports"><span class="ico">≡</span> Reports</a></li>
       <li><a href="#settings" data-target="settings"><span class="ico">⚙</span> Settings</a></li>
     </ul>
-    <div class="logout"><a href="/login.html">↪ Log out</a></div>
+
+    <div class="side-profile" id="sideProfile">
+      <div class="avatar" id="sideAvatar">?</div>
+      <div class="info">
+        <strong id="sideName">Admin</strong>
+        <small id="sideEmail">—</small>
+      </div>
+    </div>
+    <div class="side-actions">
+      <!-- <button type="button" onclick="openSettings()"><span>⚙</span> Settings</button>
+      <button type="button" class="logout-btn" onclick="window.stacklyAuth.logout()"><span>↪</span> Log out</button> -->
+    </div>
   </aside>
 
   <main class="dash-main">
@@ -226,6 +237,7 @@
 
   </main>
 </div>
+
 
 <script src="/js/main.js"></script>
 <script>

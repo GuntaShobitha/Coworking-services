@@ -1,70 +1,380 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Dashboard — STACKLY</title>
-<link rel="icon" href="/favicon.ico" />
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="/css/style.css" />
+<meta name="description" content="Your STACKLY co-working member dashboard." />
+<style>
+  :root{
+    --bg:#f7f5ef; --panel:#ffffff; --ink:#1b1b1b; --muted:#6b6b6b;
+    --line:#e7e3d8; --brand:#1b1b1b; --accent:#c9a94a;
+    --ok:#0f7a3a; --okbg:#e6f4ec; --warn:#8a5a00; --warnbg:#fbf0d6;
+    --mutedbg:#eeeae0;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+    font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Inter,sans-serif}
+  a{color:inherit;text-decoration:none}
+  button{font:inherit;cursor:pointer}
+
+  /* Layout */
+  .dash{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+  .dash-side{background:#111;color:#f4efe0;padding:20px 16px;display:flex;flex-direction:column;gap:16px;border-right:1px solid #000}
+  .dash-main{padding:28px 36px 60px;position:relative}
+
+  /* Sidebar */
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.14em;font-size:14px}
+  .brand .dot{color:var(--accent);font-size:20px}
+  .nav{display:flex;flex-direction:column;gap:2px;margin-top:6px}
+  .nav a{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:8px;color:#d8d2be;font-size:14px}
+  .nav a:hover{background:#1c1c1c;color:#fff}
+  .nav a.active{background:#242015;color:var(--accent)}
+  .side-user{margin-top:auto;background:#1a1a1a;border:1px solid #262421;border-radius:12px;padding:12px;display:flex;align-items:center;gap:10px}
+  .avatar{width:36px;height:36px;border-radius:50%;background:var(--accent);color:#111;display:grid;place-items:center;font-weight:700;font-size:13px}
+  .side-user .who{display:flex;flex-direction:column;line-height:1.2;font-size:13px}
+  .side-user .who small{color:#a49f8d;font-size:11px}
+  .side-actions{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+  .side-actions button{background:transparent;border:1px solid #2a2820;color:#e7e2cf;border-radius:8px;padding:8px 10px;text-align:left;font-size:13px}
+  .side-actions button:hover{background:#1c1c1c}
+
+  /* Topbar */
+  .dash-topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:22px}
+  .crumbs{color:var(--muted);font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+  .dash-topbar h1{margin:6px 0 0;font-size:30px;font-weight:600}
+  .top-user{position:relative;display:flex;align-items:center;gap:10px;background:var(--panel);
+    border:1px solid var(--line);border-radius:999px;padding:6px 12px 6px 6px;cursor:pointer}
+  .top-user .who{display:flex;flex-direction:column;line-height:1.2;font-size:13px}
+  .top-user .who small{color:var(--muted);font-size:11px}
+  .menu{position:absolute;top:52px;right:0;background:#fff;border:1px solid var(--line);
+    border-radius:12px;min-width:220px;box-shadow:0 12px 30px rgba(0,0,0,.08);padding:10px;z-index:20}
+  .menu .head{padding:8px 10px;border-bottom:1px solid var(--line);margin-bottom:6px}
+  .menu button{width:100%;text-align:left;background:transparent;border:0;padding:8px 10px;border-radius:8px;font-size:14px}
+  .menu button:hover{background:var(--bg)}
+  .dash-toggle{display:none;position:absolute;top:18px;left:18px;background:#111;color:#fff;
+    border:0;border-radius:8px;width:38px;height:38px;font-size:18px;z-index:30}
+
+  /* Panels */
+  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+  .kpi .lbl{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+  .kpi .val{font-size:28px;font-weight:700;margin:6px 0 2px}
+  .kpi .sub{color:var(--muted);font-size:12px}
+
+  .section{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:18px}
+  .section-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;gap:12px}
+  .section-head h3{margin:0;font-size:16px;font-weight:600}
+  .section-head p{margin:0;color:var(--muted);font-size:13px}
+  .row{display:grid;grid-template-columns:1fr 180px 120px;gap:12px;align-items:center;
+    padding:12px 0;border-top:1px solid var(--line);font-size:14px}
+  .row:first-child{border-top:0}
+  .row .mid{color:var(--muted);font-size:13px}
+  .row .end{text-align:right}
+
+  .tag{display:inline-block;font-size:11px;padding:4px 8px;border-radius:999px;font-weight:600;letter-spacing:.03em}
+  .tag.ok{background:var(--okbg);color:var(--ok)}
+  .tag.warn{background:var(--warnbg);color:var(--warn)}
+  .tag.muted{background:var(--mutedbg);color:#5a5a5a}
+
+  .link{color:#0a5cff;font-size:13px}
+  .link:hover{text-decoration:underline}
+
+  /* Modal + toast */
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);display:grid;place-items:center;z-index:50}
+  .modal{background:#fff;border-radius:16px;width:min(460px,92vw);padding:20px;border:1px solid var(--line)}
+  .modal header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+  .modal h3{margin:0;font-size:18px}
+  .modal .field{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+  .modal label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+  .modal input{padding:10px 12px;border:1px solid var(--line);border-radius:8px;font:inherit}
+  .modal .actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}
+  .btn{border:1px solid var(--line);background:#fff;padding:9px 14px;border-radius:8px;font-size:14px}
+  .btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}
+  .btn.ghost{background:transparent}
+  .close{background:transparent;border:0;font-size:22px;color:var(--muted)}
+
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+    background:#111;color:#fff;padding:10px 16px;border-radius:999px;font-size:13px;z-index:60;
+    box-shadow:0 10px 30px rgba(0,0,0,.25)}
+
+  @media (max-width:900px){
+    .dash{grid-template-columns:1fr}
+    .dash-side{position:fixed;top:0;left:0;height:100vh;width:260px;
+      transform:translateX(-100%);transition:transform .25s ease;z-index:40}
+    .dash-side.open{transform:translateX(0)}
+    .dash-toggle{display:block}
+    .dash-main{padding:72px 20px 40px}
+    .kpi-grid{grid-template-columns:repeat(2,1fr)}
+    .row{grid-template-columns:1fr auto}
+    .row .mid{grid-column:1/-1;font-size:12px}
+    .dash-topbar h1{font-size:24px}
+  }
+</style>
 </head>
 <body>
-
-<button class="dash-toggle" onclick="document.querySelector('.dash-side').classList.toggle('open')">☰</button>
-
 <div class="dash">
-  <aside class="dash-side">
-    <div class="logo"><a href="/index.html"><img src="/images/logo-dark.webp" alt="Stackly" /></a></div>
-    <ul class="dash-nav">
-      <li><a href="#" class="active"><span class="ico">◐</span> Overview</a></li>
-      <li><a href="#bookings"><span class="ico">▤</span> My Bookings</a></li>
-      <li><a href="#rooms"><span class="ico">▣</span> Meeting Rooms</a></li>
-      <li><a href="#events"><span class="ico">✦</span> Events</a></li>
-      <li><a href="#billing"><span class="ico">◈</span> Billing</a></li>
-      <li><a href="#profile"><span class="ico">◉</span> Profile</a></li>
-      <li><a href="#settings"><span class="ico">⚙</span> Settings</a></li>
-    </ul>
-    <div class="logout"><a href="/login.html">↪ Log out</a></div>
+  <aside class="dash-side" id="side">
+    <div class="brand"><span class="dot">◆</span> STACKLY</div>
+    <nav class="nav" id="nav"></nav>
+    <div class="side-user">
+      <div class="avatar" id="sideAvatar">AM</div>
+      <div class="who"><strong id="sideName">Alex Morgan</strong><small id="sideEmail">alex@stackly.co</small></div>
+    </div>
+    <div class="side-actions">
+      <button onclick="openSettings()">⚙  Settings</button>
+      <button onclick="logout()">↪  Log out</button>
+    </div>
   </aside>
 
   <main class="dash-main">
+    <button class="dash-toggle" onclick="toggleSide()">☰</button>
     <div class="dash-topbar">
       <div>
-        <div class="crumb" style="color:var(--accent-2); margin-bottom:6px;">User · Dashboard</div>
-        <h1>Welcome back, Elena.</h1>
+        <div class="crumbs" id="crumbs">User · Dashboard · Overview</div>
+        <h1 id="welcome">Welcome back, Alex.</h1>
       </div>
-      <div class="dash-user"><img src="/images/person-1.webp" alt="You" /><div><strong style="display:block;">Elena Rossi</strong><small style="color:var(--muted);">Dedicated Desk · SF</small></div></div>
+      <div class="top-user" onclick="toggleMenu(event)">
+        <div class="avatar" id="topAvatar">AM</div>
+        <div class="who"><strong id="topName">Alex Morgan</strong><small id="topEmail">alex@stackly.co</small></div>
+        <div id="menu" class="menu" style="display:none" onclick="event.stopPropagation()">
+          <div class="head">
+            <div><strong id="menuName">Alex Morgan</strong></div>
+            <small id="menuEmail" style="color:var(--muted)">alex@stackly.co</small>
+          </div>
+          <button onclick="openSettings()">⚙  Settings</button>
+          <button onclick="logout()">↪  Log out</button>
+        </div>
+      </div>
     </div>
 
-    <div class="kpi-grid">
-      <div class="kpi"><div class="label">Hours this week</div><div class="value">32</div><div class="delta">+12% vs last</div></div>
-      <div class="kpi"><div class="label">Rooms Booked</div><div class="value">4</div><div class="delta">This month</div></div>
-      <div class="kpi"><div class="label">Guest Visits</div><div class="value">7</div><div class="delta">+2 this week</div></div>
-      <div class="kpi"><div class="label">Credits Left</div><div class="value">18</div><div class="delta">of 24 hrs</div></div>
-    </div>
-
-    <div class="panel" id="bookings">
-      <h2>Upcoming Bookings</h2>
-      <div class="panel-row"><span>Meeting Room · Oak</span><span>Tue 10:00 – 11:00</span><span class="tag ok">Confirmed</span></div>
-      <div class="panel-row"><span>Phone Booth · 3</span><span>Wed 14:00 – 14:30</span><span class="tag ok">Confirmed</span></div>
-      <div class="panel-row"><span>Studio A</span><span>Fri 16:00 – 18:00</span><span class="tag warn">Pending</span></div>
-      <div class="panel-row"><span>Event Space</span><span>Sat 19:00 – 22:00</span><span class="tag ok">Confirmed</span></div>
-    </div>
-
-    <div class="panel" id="events">
-      <h2>Upcoming Events</h2>
-      <div class="panel-row"><span>Wednesday Workshop: Design Critique</span><span>Wed 18:00</span><a href="#" style="color:var(--accent-2);">RSVP</a></div>
-      <div class="panel-row"><span>Members Dinner</span><span>Fri 20:00</span><a href="#" style="color:var(--accent-2);">RSVP</a></div>
-      <div class="panel-row"><span>Morning Yoga</span><span>Sat 08:00</span><a href="#" style="color:var(--accent-2);">RSVP</a></div>
-    </div>
-
-    <div class="panel" id="billing">
-      <h2>Recent Invoices</h2>
-      <div class="panel-row"><span>March 2026</span><span>$399.00</span><span class="tag ok">Paid</span></div>
-      <div class="panel-row"><span>February 2026</span><span>$399.00</span><span class="tag ok">Paid</span></div>
-      <div class="panel-row"><span>January 2026</span><span>$399.00</span><span class="tag ok">Paid</span></div>
-    </div>
+    <div id="content"></div>
   </main>
 </div>
-<script src="/js/main.js"></script>
-</body></html>
+
+<div id="modalHost"></div>
+<div id="toastHost"></div>
+
+<script>
+/* ---------- state ---------- */
+const DEFAULT_USER = { name:"Alex Morgan", email:"alex@stackly.co", role:"user" };
+let user = loadUser();
+let active = "overview";
+
+const NAV = [
+  { key:"overview", label:"Overview",     ico:"◐" },
+  { key:"bookings", label:"My Bookings",  ico:"▤" },
+  { key:"rooms",    label:"Meeting Rooms",ico:"▣" },
+  { key:"events",   label:"Events",       ico:"✦" },
+  { key:"billing",  label:"Billing",      ico:"◈" },
+  { key:"profile",  label:"Profile",      ico:"◉" },
+];
+
+function loadUser(){
+  try{ const raw = localStorage.getItem("stackly.user");
+    if(raw) return {...DEFAULT_USER, ...JSON.parse(raw)}; }catch(e){}
+  return {...DEFAULT_USER};
+}
+function initials(n){ return n.split(" ").map(s=>s[0]).filter(Boolean).slice(0,2).join("").toUpperCase(); }
+
+/* ---------- render ---------- */
+function renderNav(){
+  const n = document.getElementById("nav");
+  n.innerHTML = NAV.map(x=>`<a href="#" data-k="${x.key}" class="${x.key===active?'active':''}">
+      <span>${x.ico}</span><span>${x.label}</span></a>`).join("");
+  n.querySelectorAll("a").forEach(a=>a.addEventListener("click",e=>{
+    e.preventDefault(); active = a.dataset.k; document.getElementById("side").classList.remove("open");
+    render();
+  }));
+}
+function renderHeader(){
+  const first = user.name.split(" ")[0];
+  const lbl = NAV.find(n=>n.key===active).label;
+  document.getElementById("crumbs").textContent = `User · Dashboard · ${lbl}`;
+  document.getElementById("welcome").textContent = `Welcome back, ${first}.`;
+  const ini = initials(user.name);
+  ["sideAvatar","topAvatar"].forEach(id=>document.getElementById(id).textContent=ini);
+  ["sideName","topName","menuName"].forEach(id=>document.getElementById(id).textContent=user.name);
+  ["sideEmail","topEmail","menuEmail"].forEach(id=>document.getElementById(id).textContent=user.email);
+}
+function render(){ renderNav(); renderHeader(); document.getElementById("content").innerHTML = modules[active](); bindActions(); }
+
+/* ---------- helpers ---------- */
+const tag = (k,t)=>`<span class="tag ${k}">${t}</span>`;
+const row = (a,b,c)=>`<div class="row"><div>${a}</div><div class="mid">${b}</div><div class="end">${c}</div></div>`;
+const section = (title,sub,body)=>`
+  <section class="section">
+    <div class="section-head"><div><h3>${title}</h3>${sub?`<p>${sub}</p>`:""}</div></div>
+    ${body}
+  </section>`;
+const kpi = (l,v,s)=>`<div class="kpi"><div class="lbl">${l}</div><div class="val">${v}</div><div class="sub">${s}</div></div>`;
+const act = (msg,text="Action")=>`<a href="#" class="link" data-toast="${msg}">${text}</a>`;
+
+/* ---------- modules ---------- */
+const modules = {
+  overview: () => `
+    <div class="kpi-grid">
+      ${kpi("Hours this week","32","+12% vs last")}
+      ${kpi("Rooms Booked","4","This month")}
+      ${kpi("Guest Visits","7","+2 this week")}
+      ${kpi("Credits Left","18","of 24 hrs")}
+    </div>
+    ${section("Today","What's on for you today",
+      row("Hot Desk · Level 2","All day",tag("ok","Active"))+
+      row("Oak Room","10:00 – 11:00",tag("ok","Confirmed"))+
+      row("Phone Booth · 3","14:00 – 14:30",tag("warn","Starts soon"))
+    )}
+    ${section("Quick actions","Common member tasks",
+      row("Book a meeting room","Real-time availability",act("Booking flow opened","Open"))+
+      row("Invite a guest","Send a day pass",act("Guest invite sent","Send"))+
+      row("Reserve event space","Weekend availability",act("Event browser opened","Browse"))
+    )}
+    ${section("Community","This week at STACKLY",
+      row("New member: Priya Shah","Design studio",act("Hello sent","Say hi"))+
+      row("Coffee bar restocked","Level 1",tag("ok","Fresh"))+
+      row("Rooftop reopens Friday","Members only",act("RSVP confirmed","RSVP"))
+    )}`,
+
+  bookings: () => `
+    ${section("Upcoming","Your next reservations",
+      row("Meeting Room · Oak","Tue 10:00 – 11:00",tag("ok","Confirmed"))+
+      row("Phone Booth · 3","Wed 14:00 – 14:30",tag("ok","Confirmed"))+
+      row("Studio A","Fri 16:00 – 18:00",tag("warn","Pending"))+
+      row("Event Space","Sat 19:00 – 22:00",tag("ok","Confirmed"))
+    )}
+    ${section("Waitlist","Requested but not yet confirmed",
+      row("Cedar Room · 10 seats","Mon 09:00 – 10:30",tag("muted","Waiting"))+
+      row("Rooftop Lounge","Sun 18:00 – 21:00",tag("muted","Waiting"))+
+      row("Podcast Studio","Thu 13:00 – 15:00",tag("muted","Waiting"))
+    )}
+    ${section("History","Recently completed",
+      row("Oak Room","Mar 22",tag("muted","Completed"))+
+      row("Phone Booth · 1","Mar 18",tag("muted","Completed"))+
+      row("Studio B","Mar 12",act("Booking re-requested","Rebook"))
+    )}`,
+
+  rooms: () => `
+    ${section("Meeting Rooms","Bookable rooms",
+      row("Oak Room · 6 seats",tag("ok","Available"),act("Room booked: Oak Room","Book"))+
+      row("Cedar Room · 10 seats",tag("ok","Available"),act("Room booked: Cedar Room","Book"))+
+      row("Birch Room · 4 seats",tag("ok","Available"),act("Room booked: Birch Room","Book"))
+    )}
+    ${section("Phone Booths","For quick calls",
+      row("Booth · 1",tag("ok","Available"),act("Room booked: Booth 1","Book"))+
+      row("Booth · 2",tag("warn","In use"),tag("warn","Busy"))+
+      row("Booth · 3",tag("ok","Available"),act("Room booked: Booth 3","Book"))
+    )}
+    ${section("Studios","Creative spaces",
+      row("Studio A · 12 seats",tag("warn","Busy"),tag("muted","Unavailable"))+
+      row("Studio B · 8 seats",tag("ok","Available"),act("Room booked: Studio B","Book"))+
+      row("Podcast Studio",tag("ok","Available"),act("Room booked: Podcast Studio","Book"))
+    )}`,
+
+  events: () => `
+    ${section("This week","Community events",
+      row("Wednesday Workshop: Design Critique","Wed 18:00",act("RSVP confirmed for: Design Critique","RSVP"))+
+      row("Members Dinner","Fri 20:00",act("RSVP confirmed for: Members Dinner","RSVP"))+
+      row("Morning Yoga","Sat 08:00",act("RSVP confirmed for: Morning Yoga","RSVP"))
+    )}
+    ${section("Workshops","Learn something new",
+      row("Intro to Product Strategy","Mon 17:00",act("RSVP confirmed for: Product Strategy","RSVP"))+
+      row("Freelance Finance 101","Thu 12:30",act("RSVP confirmed for: Freelance Finance","RSVP"))+
+      row("Founders Roundtable","Fri 09:00",act("RSVP confirmed for: Founders Roundtable","RSVP"))
+    )}
+    ${section("Past events","Catch up",
+      row("Brand Storytelling Panel","Mar 20",act("Opening recording…","Watch"))+
+      row("Members Mixer · March","Mar 07",act("Gallery opened","Gallery"))+
+      row("Coffee Cupping","Feb 24",act("Notes opened","Notes"))
+    )}`,
+
+  billing: () => `
+    ${section("Invoices","Recent charges",
+      row("March 2026","$399.00",tag("ok","Paid"))+
+      row("February 2026","$399.00",tag("ok","Paid"))+
+      row("January 2026","$399.00",tag("ok","Paid"))
+    )}
+    ${section("Payment methods","Cards on file",
+      row("Visa · •••• 4242","Expires 09/28",tag("ok","Default"))+
+      row("Mastercard · •••• 1177","Expires 03/27",act("Set as default","Make default"))+
+      row("Add a new card","Secured by Stripe",act("Add card flow opened","Add"))
+    )}
+    ${section("Usage","This billing cycle",
+      row("Meeting-room credits","18 / 24 hrs",tag("ok","On track"))+
+      row("Guest passes","3 / 5 used",tag("warn","Low"))+
+      row("Printing quota","82 / 200 pages",tag("ok","Healthy"))
+    )}`,
+
+  profile: () => `
+    ${section("Account","Your details",
+      row("Name",user.name,"")+
+      row("Email",user.email,"")+
+      row("Role",user.role,"")+
+      row("Edit profile","Update name, email, avatar",`<a href="#" class="link" onclick="openSettings();return false;">Open</a>`)
+    )}
+    ${section("Preferences","Personalise your experience",
+      row("Email notifications","Bookings, events, invoices",tag("ok","On"))+
+      row("Preferred floor","Level 2 · Quiet zone",tag("ok","Saved"))+
+      row("Calendar sync","Google · connected",tag("ok","Active"))
+    )}
+    ${section("Security","Keep your account safe",
+      row("Password","Last changed 42 days ago",act("Password flow opened","Update"))+
+      row("Two-factor auth","Not enabled",tag("warn","Recommended"))+
+      row("Active sessions","2 devices",act("Session manager opened","Manage"))
+    )}`,
+};
+
+function bindActions(){
+  document.querySelectorAll("[data-toast]").forEach(el=>{
+    el.addEventListener("click",e=>{e.preventDefault();showToast(el.dataset.toast);});
+  });
+}
+
+/* ---------- interactions ---------- */
+function toggleSide(){ document.getElementById("side").classList.toggle("open"); }
+function toggleMenu(e){ e.stopPropagation();
+  const m=document.getElementById("menu"); m.style.display = m.style.display==="none"?"block":"none"; }
+document.addEventListener("click",()=>{document.getElementById("menu").style.display="none";});
+
+function logout(){
+  try{ localStorage.removeItem("stackly.user"); localStorage.removeItem("stackly.token"); }catch(e){}
+  showToast("Logged out");
+  setTimeout(()=>{ window.location.href = "/"; }, 500);
+}
+
+function openSettings(){
+  document.getElementById("menu").style.display="none";
+  const host = document.getElementById("modalHost");
+  host.innerHTML = `
+    <div class="modal-bg" onclick="closeSettings()">
+      <div class="modal" onclick="event.stopPropagation()">
+        <header><h3>Settings</h3><button class="close" onclick="closeSettings()">×</button></header>
+        <div class="field"><label>Full name</label><input id="fName" value="${escapeHtml(user.name)}"/></div>
+        <div class="field"><label>Email</label><input id="fEmail" value="${escapeHtml(user.email)}"/></div>
+        <div class="actions">
+          <button class="btn ghost" onclick="closeSettings()">Cancel</button>
+          <button class="btn primary" onclick="saveSettings()">Save changes</button>
+        </div>
+      </div>
+    </div>`;
+}
+function closeSettings(){ document.getElementById("modalHost").innerHTML=""; }
+function saveSettings(){
+  const n=document.getElementById("fName").value.trim()||user.name;
+  const e=document.getElementById("fEmail").value.trim()||user.email;
+  user = {...user, name:n, email:e};
+  try{ localStorage.setItem("stackly.user", JSON.stringify(user)); }catch(_){}
+  closeSettings(); render(); showToast("Settings saved");
+}
+function escapeHtml(s){ return s.replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+let toastTimer;
+function showToast(msg){
+  const host = document.getElementById("toastHost");
+  host.innerHTML = `<div class="toast">${escapeHtml(msg)}</div>`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>host.innerHTML="", 2200);
+}
+
+render();
+</script>
+</body>
+</html>
