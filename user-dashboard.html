@@ -7,6 +7,9 @@
 <link rel="icon" href="/favicon.ico" />
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/css/style.css" />
+<link rel="stylesheet" href="/css/dashboard-extra.css" />
+<script src="/js/auth.js"></script>
+<script>window.stacklyAuth.requireRole('user');</script>
 </head>
 <body>
 
@@ -16,24 +19,44 @@
   <aside class="dash-side">
     <div class="logo"><a href="/index.html"><img src="/images/logo-dark.webp" alt="Stackly" /></a></div>
     <ul class="dash-nav">
-      <li><a href="#" class="active"><span class="ico">◐</span> Overview</a></li>
-      <li><a href="#bookings"><span class="ico">▤</span> My Bookings</a></li>
-      <li><a href="#rooms"><span class="ico">▣</span> Meeting Rooms</a></li>
-      <li><a href="#events"><span class="ico">✦</span> Events</a></li>
-      <li><a href="#billing"><span class="ico">◈</span> Billing</a></li>
-      <li><a href="#profile"><span class="ico">◉</span> Profile</a></li>
-      <li><a href="#settings"><span class="ico">⚙</span> Settings</a></li>
+      <li><a href="#" class="active" data-nav="overview"><span class="ico">◐</span> Overview</a></li>
+      <li><a href="#bookings" data-nav="bookings"><span class="ico">▤</span> My Bookings</a></li>
+      <li><a href="#rooms" data-nav="rooms"><span class="ico">▣</span> Meeting Rooms</a></li>
+      <li><a href="#events" data-nav="events"><span class="ico">✦</span> Events</a></li>
+      <li><a href="#billing" data-nav="billing"><span class="ico">◈</span> Billing</a></li>
+      <li><a href="#profile" data-nav="profile"><span class="ico">◉</span> Profile</a></li>
+      <li><a  onclick="openSettings()"><span>⚙</span> Settings</a></li>
+      <li><a class="logout-btn" onclick="window.stacklyAuth.logout()"><span>↪</span> Log out</a></li>
     </ul>
-    <div class="logout"><a href="/login.html">↪ Log out</a></div>
+
+    <div class="side-profile" id="sideProfile">
+      <div class="avatar" id="sideAvatar">?</div>
+      <div class="info">
+        <strong id="sideName">Member</strong>
+        <small id="sideEmail">—</small>
+      </div>
+    </div>
+    <div class="side-actions">
+      <!-- <button type="button" onclick="openSettings()"><span>⚙</span> Settings</button>
+      <button type="button" class="logout-btn" onclick="window.stacklyAuth.logout()"><span>↪</span> Log out</button> -->
+    </div>
   </aside>
 
   <main class="dash-main">
     <div class="dash-topbar">
       <div>
         <div class="crumb" style="color:var(--accent-2); margin-bottom:6px;">User · Dashboard</div>
-        <h1>Welcome back, Elena.</h1>
+        <h1>Welcome back, <span id="topName">Member</span>.</h1>
       </div>
-      <div class="dash-user"><img src="/images/person-1.webp" alt="You" /><div><strong style="display:block;">Elena Rossi</strong><small style="color:var(--muted);">Dedicated Desk · SF</small></div></div>
+      <div class="dash-user" id="topProfile" onclick="toggleProfileMenu(event)">
+        <div class="avatar-fallback" id="topAvatar">?</div>
+        <div class="meta"><strong style="display:block;" id="topFullName">Member</strong><small style="color:var(--muted);" id="topEmail">—</small></div>
+        <div class="profile-menu" id="profileMenu" onclick="event.stopPropagation()">
+          <div class="pm-header"><strong id="pmName">Member</strong><small id="pmEmail">—</small></div>
+          <!-- <button type="button" onclick="openSettings()"><span>⚙</span> Settings</button>
+          <button type="button" class="logout-btn" onclick="window.stacklyAuth.logout()"><span>↪</span> Log out</button> -->
+        </div>
+      </div>
     </div>
 
     <div class="kpi-grid">
@@ -51,11 +74,18 @@
       <div class="panel-row"><span>Event Space</span><span>Sat 19:00 – 22:00</span><span class="tag ok">Confirmed</span></div>
     </div>
 
+    <div class="panel" id="rooms">
+      <h2>Meeting Rooms</h2>
+      <div class="panel-row"><span>Oak Room · 6 seats</span><span>Available</span><a href="#" style="color:var(--accent-2);" onclick="bookRoom(event,'Oak Room')">Book</a></div>
+      <div class="panel-row"><span>Cedar Room · 10 seats</span><span>Available</span><a href="#" style="color:var(--accent-2);" onclick="bookRoom(event,'Cedar Room')">Book</a></div>
+      <div class="panel-row"><span>Studio A · 12 seats</span><span>Busy</span><span class="tag warn">Unavailable</span></div>
+    </div>
+
     <div class="panel" id="events">
       <h2>Upcoming Events</h2>
-      <div class="panel-row"><span>Wednesday Workshop: Design Critique</span><span>Wed 18:00</span><a href="#" style="color:var(--accent-2);">RSVP</a></div>
-      <div class="panel-row"><span>Members Dinner</span><span>Fri 20:00</span><a href="#" style="color:var(--accent-2);">RSVP</a></div>
-      <div class="panel-row"><span>Morning Yoga</span><span>Sat 08:00</span><a href="#" style="color:var(--accent-2);">RSVP</a></div>
+      <div class="panel-row"><span>Wednesday Workshop: Design Critique</span><span>Wed 18:00</span><a href="#" style="color:var(--accent-2);" onclick="rsvp(event,'Design Critique')">RSVP</a></div>
+      <div class="panel-row"><span>Members Dinner</span><span>Fri 20:00</span><a href="#" style="color:var(--accent-2);" onclick="rsvp(event,'Members Dinner')">RSVP</a></div>
+      <div class="panel-row"><span>Morning Yoga</span><span>Sat 08:00</span><a href="#" style="color:var(--accent-2);" onclick="rsvp(event,'Morning Yoga')">RSVP</a></div>
     </div>
 
     <div class="panel" id="billing">
@@ -64,7 +94,57 @@
       <div class="panel-row"><span>February 2026</span><span>$399.00</span><span class="tag ok">Paid</span></div>
       <div class="panel-row"><span>January 2026</span><span>$399.00</span><span class="tag ok">Paid</span></div>
     </div>
+
+    <div class="panel" id="profile">
+      <h2>Profile</h2>
+      <div class="panel-row"><span>Name</span><span id="profName">—</span></div>
+      <div class="panel-row"><span>Email</span><span id="profEmail">—</span></div>
+      <div class="panel-row"><span>Role</span><span id="profRole">—</span></div>
+    </div>
   </main>
 </div>
+
 <script src="/js/main.js"></script>
+<script>
+(function () {
+  const u = window.stacklyAuth.get();
+  if (!u) return;
+  const initials = window.stacklyAuth.initials(u.name);
+  document.getElementById('sideAvatar').textContent = initials;
+  document.getElementById('sideName').textContent = u.name;
+  document.getElementById('sideEmail').textContent = u.email;
+  document.getElementById('topAvatar').textContent = initials;
+  document.getElementById('topName').textContent = u.name;
+  document.getElementById('topFullName').textContent = u.name;
+  document.getElementById('topEmail').textContent = u.email;
+  document.getElementById('pmName').textContent = u.name;
+  document.getElementById('pmEmail').textContent = u.email;
+  document.getElementById('profName').textContent = u.name;
+  document.getElementById('profEmail').textContent = u.email;
+  document.getElementById('profRole').textContent = u.role;
+})();
+
+function toggleProfileMenu(e) {
+  e.stopPropagation();
+  document.getElementById('profileMenu').classList.toggle('open');
+}
+document.addEventListener('click', () => {
+  document.getElementById('profileMenu')?.classList.remove('open');
+});
+function openSettings() {
+  document.getElementById('profileMenu')?.classList.remove('open');
+  document.getElementById('profile').scrollIntoView({ behavior: 'smooth' });
+}
+function bookRoom(e, name) { e.preventDefault(); alert('Room booked: ' + name); }
+function rsvp(e, name) { e.preventDefault(); alert('RSVP confirmed for: ' + name); }
+
+// Highlight nav based on hash + section-based active state
+document.querySelectorAll('.dash-nav a[data-nav]').forEach(a => {
+  a.addEventListener('click', () => {
+    document.querySelectorAll('.dash-nav a').forEach(x => x.classList.remove('active'));
+    a.classList.add('active');
+    document.querySelector('.dash-side')?.classList.remove('open');
+  });
+});
+</script>
 </body></html>

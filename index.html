@@ -10,6 +10,155 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="./css/style.css" />
+
+
+
+
+
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, -apple-system, sans-serif; background: #fff; color: #111; }
+
+  .wrap{
+    width:100%;
+    max-width:1600px;
+    margin:auto;
+    padding:60px 40px;
+}
+
+
+
+
+  h1 { text-align: center; font-size: 28px; font-weight: 600; margin-bottom: 32px; }
+
+  .grid {
+    display: grid;
+    gap: 24px;
+     grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  }
+  @media (min-width: 640px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1024px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+
+  .card{
+    position:relative;
+    width:100%;
+    height:380px;
+    overflow:hidden;
+    border:none;
+    cursor:pointer;
+    padding:0;
+    border-radius:8px;
+}
+
+.card img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    object-position: center;
+    transition: transform .5s ease;
+}
+
+ .card:hover img{
+    transform:scale(1.08);
+}   
+
+
+
+@media (max-width: 768px) {
+    .card {
+        height: 300px;
+        width: 250px;
+    }
+}
+
+  .overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: rgba(72, 187, 156, 0.75);
+    color: #fff;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .3s ease, visibility .3s ease;
+}
+
+.card:hover .overlay {
+    opacity: 1;
+    visibility: visible;
+}
+  .overlay .icon {
+    width: 56px; height: 56px;
+    border: 2px solid #fff;
+    border-radius: 6px;
+    display: grid; place-items: center;
+  }
+  .overlay .label { font-size: 22px; font-weight: 600; }
+
+  /* Desktop: hide overlay, show on hover */
+  @media (hover: hover) and (min-width: 640px) {
+    .overlay { opacity: 0; }
+    .card:hover .overlay { opacity: 1; }
+  } 
+
+  /* Lightbox */
+  .lightbox {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.9);
+    display: none;
+    align-items: center; justify-content: center;
+    z-index: 50;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox img {
+    width: 80%;
+    max-width: 900px;
+    height: auto;
+    max-height: 80vh;
+    object-fit: contain;
+    border-radius: 8px;
+}
+  .lightbox button {
+    position: absolute;
+    background: rgba(255,255,255,.1);
+    color: #fff; border: none; cursor: pointer;
+    display: grid; place-items: center;
+  }
+  .lightbox .close{
+    position:absolute;
+    top:25px;
+    right:30px;
+    width:55px;
+    height:55px;
+    font-size:32px;
+    color:#fff;
+    background:transparent;
+    border:none;
+    cursor:pointer;
+    z-index:9999;
+}
+
+
+
+  .lightbox .prev, .lightbox .next {
+    top: 50%; transform: translateY(-50%);
+    width: 48px; height: 48px; border-radius: 50%;
+  }
+  .lightbox .prev { left: 16px; }
+  .lightbox .next { right: 16px; }
+  .lightbox button:hover { background: rgba(255,255,255,.2); }
+</style>
+
+
+
+
+
+
+
 </head>
 <body>
 
@@ -197,12 +346,66 @@
       <div class="eyebrow">Our People</div>
       <h2>The team behind the space.</h2>
     </div>
-    <div class="team-grid">
-      <div class="team-card reveal delay-1"><img src="./images/person-1.webp" alt="Elena" /><div class="team-info"><span>Founder</span><strong>Elena Rossi</strong></div></div>
+    <!-- <div class="team-grid"> -->
+      <!-- <div class="team-card reveal delay-1"><img src="./images/person-1.webp" alt="Elena" /><div class="team-info"><span>Founder</span><strong>Elena Rossi</strong></div></div>
       <div class="team-card reveal delay-2"><img src="./images/person-2.webp" alt="James" /><div class="team-info"><span>Community</span><strong>James Whitaker</strong></div></div>
       <div class="team-card reveal delay-3"><img src="./images/person-1.webp" alt="Aya" /><div class="team-info"><span>Operations</span><strong>Aya Nakamura</strong></div></div>
-      <div class="team-card reveal delay-4"><img src="./images/person-2.webp" alt="Marcus" /><div class="team-info"><span>Hospitality</span><strong>Marcus Lee</strong></div></div>
-    </div>
+      <div class="team-card reveal delay-4"><img src="./images/person-2.webp" alt="Marcus" /><div class="team-info"><span>Hospitality</span><strong>Marcus Lee</strong></div></div> -->
+
+
+
+      
+
+      <main class="wrap">
+    <h1>Gallery</h1>
+    <div class="grid" id="grid"></div>
+  </main>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true">
+    <button class="close" id="closeBtn" aria-label="Close">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+    <button class="prev" id="prevBtn" aria-label="Previous">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    </button>
+    <img id="lightboxImg" alt="" />
+    <button class="next" id="nextBtn" aria-label="Next">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+    </button>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
   </div>
 </section>
 
@@ -259,5 +462,73 @@
 </footer>
 
 <script src="./js/main.js"></script>
+
+
+<script>
+
+  const IMAGES = [
+    
+ 
+  "images/g1.webp",
+  "images/g2.webp",
+  "images/g3.webp",
+  "images/g4.webp",
+  "images/g5.webp",
+  "images/g6.webp"
+];
+
+  
+
+  const grid = document.getElementById('grid');
+  IMAGES.forEach((src, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'card';
+    btn.setAttribute('aria-label', `Open image ${i+1}`);
+    btn.innerHTML = `
+      <img src="${src}" alt="Gallery image ${i+1}" loading="lazy" />
+      <span class="overlay">
+        <span class="icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <circle cx="9" cy="9" r="2"/>
+            <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+          </svg>
+        </span>
+        <span class="label">View Gallery</span>
+      </span>`;
+    btn.addEventListener('click', () => open(i));
+    grid.appendChild(btn);
+  });
+
+  const lightbox = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lightboxImg');
+  let idx = 0;
+
+  function open(i)  { idx = i; lbImg.src = IMAGES[i]; lightbox.classList.add('open'); document.body.style.overflow = 'hidden'; }
+  function close()  { lightbox.classList.remove('open'); document.body.style.overflow = ''; }
+  function prev()   { idx = (idx - 1 + IMAGES.length) % IMAGES.length; lbImg.src = IMAGES[idx]; }
+  function next()   { idx = (idx + 1) % IMAGES.length; lbImg.src = IMAGES[idx]; }
+
+  document.getElementById('closeBtn').onclick = close;
+  document.getElementById('prevBtn').onclick  = (e) => { e.stopPropagation(); prev(); };
+  document.getElementById('nextBtn').onclick  = (e) => { e.stopPropagation(); next(); };
+  lightbox.addEventListener('click', (e) => { if (e.target === lightbox) close(); });
+  document.addEventListener('keydown', (e) => {
+    if (!lightbox.classList.contains('open')) return;
+    if (e.key === 'Escape') close();
+    else if (e.key === 'ArrowLeft') prev();
+    else if (e.key === 'ArrowRight') next();
+  });
+</script>
+
+
+
+
+
+
+
+
+
+
 </body>
 </html>

@@ -7,6 +7,9 @@
 <link rel="icon" href="/favicon.ico" />
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/css/style.css" />
+<link rel="stylesheet" href="/css/dashboard-extra.css" />
+<script src="/js/auth.js"></script>
+<script>window.stacklyAuth.requireRole('admin');</script>
 </head>
 <body>
 
@@ -16,16 +19,28 @@
   <aside class="dash-side">
     <div class="logo"><a href="/index.html"><img src="/images/logo-dark.webp" alt="Stackly" /></a></div>
     <ul class="dash-nav">
-      <li><a href="#" class="active"><span class="ico">◐</span> Overview</a></li>
-      <li><a href="#members"><span class="ico">◉</span> Members</a></li>
-      <li><a href="#locations"><span class="ico">◈</span> Locations</a></li>
-      <li><a href="#bookings"><span class="ico">▤</span> Bookings</a></li>
-      <li><a href="#revenue"><span class="ico">▣</span> Revenue</a></li>
-      <li><a href="#events"><span class="ico">✦</span> Events</a></li>
-      <li><a href="#reports"><span class="ico">≡</span> Reports</a></li>
-      <li><a href="#settings"><span class="ico">⚙</span> Settings</a></li>
+      <li><a href="#" class="active" data-nav="overview"><span class="ico">◐</span> Overview</a></li>
+      <li><a href="#members" data-nav="members"><span class="ico">◉</span> Members</a></li>
+      <li><a href="#locations" data-nav="locations"><span class="ico">◈</span> Locations</a></li>
+      <li><a href="#bookings" data-nav="bookings"><span class="ico">▤</span> Bookings</a></li>
+      <li><a href="#revenue" data-nav="revenue"><span class="ico">▣</span> Revenue</a></li>
+      <li><a href="#events" data-nav="events"><span class="ico">✦</span> Events</a></li>
+      <li><a href="#reports" data-nav="reports"><span class="ico">≡</span> Reports</a></li>
+      <li><a  onclick="openSettings()"><span>⚙</span> Settings</a></li>
+      <li><a class="logout-btn" onclick="window.stacklyAuth.logout()"><span>↪</span> Log out</a></li>
     </ul>
-    <div class="logout"><a href="/login.html">↪ Log out</a></div>
+
+    <div class="side-profile" id="sideProfile">
+      <div class="avatar" id="sideAvatar">?</div>
+      <div class="info">
+        <strong id="sideName">Admin</strong>
+        <small id="sideEmail">—</small>
+      </div>
+    </div>
+    <div class="side-actions">
+      <!-- <button type="button" onclick="openSettings()"><span>⚙</span> Settings</button>
+      <button type="button" class="logout-btn" onclick="window.stacklyAuth.logout()"><span>↪</span> Log out</button> -->
+    </div>
   </aside>
 
   <main class="dash-main">
@@ -34,7 +49,15 @@
         <div class="crumb" style="color:var(--accent-2); margin-bottom:6px;">Admin · Dashboard</div>
         <h1>Operations Overview</h1>
       </div>
-      <div class="dash-user"><img src="/images/person-2.webp" alt="Admin" /><div><strong style="display:block;">James Whitaker</strong><small style="color:var(--muted);">Head of Community</small></div></div>
+      <div class="dash-user" id="topProfile" onclick="toggleProfileMenu(event)">
+        <div class="avatar-fallback" id="topAvatar">?</div>
+        <div class="meta"><strong style="display:block;" id="topFullName">Admin</strong><small style="color:var(--muted);" id="topEmail">—</small></div>
+        <div class="profile-menu" id="profileMenu" onclick="event.stopPropagation()">
+          <div class="pm-header"><strong id="pmName">Admin</strong><small id="pmEmail">—</small></div>
+          <button type="button" onclick="openSettings()"><span>⚙</span> Settings</button>
+          <button type="button" class="logout-btn" onclick="window.stacklyAuth.logout()"><span>↪</span> Log out</button>
+        </div>
+      </div>
     </div>
 
     <div class="kpi-grid">
@@ -59,6 +82,13 @@
       <div class="panel-row"><span>London · Shoreditch</span><span>81% occupied</span><span class="tag warn">Watch</span></div>
     </div>
 
+    <div class="panel" id="bookings">
+      <h2>Bookings Today</h2>
+      <div class="panel-row"><span>Oak Room</span><span>10:00 – 11:00 · Elena Rossi</span><span class="tag ok">Confirmed</span></div>
+      <div class="panel-row"><span>Studio A</span><span>13:00 – 15:00 · Aya Nakamura</span><span class="tag ok">Confirmed</span></div>
+      <div class="panel-row"><span>Event Space</span><span>19:00 – 22:00 · Members Dinner</span><span class="tag warn">Setup</span></div>
+    </div>
+
     <div class="panel" id="revenue">
       <h2>Revenue Breakdown</h2>
       <div class="panel-row"><span>Memberships</span><span>$268,400</span><span>78%</span></div>
@@ -66,7 +96,58 @@
       <div class="panel-row"><span>Events</span><span>$21,800</span><span>7%</span></div>
       <div class="panel-row"><span>Other</span><span>$9,900</span><span>3%</span></div>
     </div>
+
+    <div class="panel" id="events">
+      <h2>Upcoming Events</h2>
+      <div class="panel-row"><span>Design Critique</span><span>Wed 18:00 · 24 RSVPs</span><span class="tag ok">On track</span></div>
+      <div class="panel-row"><span>Members Dinner</span><span>Fri 20:00 · 62 RSVPs</span><span class="tag ok">On track</span></div>
+      <div class="panel-row"><span>Morning Yoga</span><span>Sat 08:00 · 12 RSVPs</span><span class="tag warn">Low</span></div>
+    </div>
+
+    <div class="panel" id="reports">
+      <h2>Reports</h2>
+      <div class="panel-row"><span>Monthly Occupancy</span><span>March 2026</span><a href="#" style="color:var(--accent-2);" onclick="downloadReport(event,'Occupancy')">Download</a></div>
+      <div class="panel-row"><span>Revenue Summary</span><span>Q1 2026</span><a href="#" style="color:var(--accent-2);" onclick="downloadReport(event,'Revenue')">Download</a></div>
+      <div class="panel-row"><span>Member Churn</span><span>March 2026</span><a href="#" style="color:var(--accent-2);" onclick="downloadReport(event,'Churn')">Download</a></div>
+    </div>
   </main>
 </div>
+
 <script src="/js/main.js"></script>
+<script>
+(function () {
+  const u = window.stacklyAuth.get();
+  if (!u) return;
+  const initials = window.stacklyAuth.initials(u.name);
+  document.getElementById('sideAvatar').textContent = initials;
+  document.getElementById('sideName').textContent = u.name;
+  document.getElementById('sideEmail').textContent = u.email;
+  document.getElementById('topAvatar').textContent = initials;
+  document.getElementById('topFullName').textContent = u.name;
+  document.getElementById('topEmail').textContent = u.email;
+  document.getElementById('pmName').textContent = u.name;
+  document.getElementById('pmEmail').textContent = u.email;
+})();
+
+function toggleProfileMenu(e) {
+  e.stopPropagation();
+  document.getElementById('profileMenu').classList.toggle('open');
+}
+document.addEventListener('click', () => {
+  document.getElementById('profileMenu')?.classList.remove('open');
+});
+function openSettings() {
+  document.getElementById('profileMenu')?.classList.remove('open');
+  alert('Settings — coming soon.');
+}
+function downloadReport(e, name) { e.preventDefault(); alert('Downloading report: ' + name); }
+
+document.querySelectorAll('.dash-nav a[data-nav]').forEach(a => {
+  a.addEventListener('click', () => {
+    document.querySelectorAll('.dash-nav a').forEach(x => x.classList.remove('active'));
+    a.classList.add('active');
+    document.querySelector('.dash-side')?.classList.remove('open');
+  });
+});
+</script>
 </body></html>
