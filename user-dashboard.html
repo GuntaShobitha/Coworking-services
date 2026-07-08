@@ -3,378 +3,655 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Dashboard — STACKLY</title>
+<title>Member Dashboard — STACKLY</title>
 <meta name="description" content="Your STACKLY co-working member dashboard." />
+<link rel="icon" href="/favicon.ico" />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 <style>
-  :root{
-    --bg:#f7f5ef; --panel:#ffffff; --ink:#1b1b1b; --muted:#6b6b6b;
-    --line:#e7e3d8; --brand:#1b1b1b; --accent:#c9a94a;
-    --ok:#0f7a3a; --okbg:#e6f4ec; --warn:#8a5a00; --warnbg:#fbf0d6;
-    --mutedbg:#eeeae0;
+/* =========================================================
+   DESIGN TOKENS
+   ========================================================= */
+:root{
+  --bg:#f6f4ee;
+  --panel:#ffffff;
+  --panel-2:#fbfaf5;
+  --ink:#141414;
+  --ink-2:#3a3a3a;
+  --muted:#7a7a7a;
+  --line:#e7e3d8;
+  --brand:#141414;
+  --accent:#c9a94a;
+  --accent-2:#a8892f;
+  --ok:#0f7a3a;   --okbg:#e6f4ec;
+  --warn:#8a5a00; --warnbg:#fbf0d6;
+  --bad:#a11212;  --badbg:#fbe6e6;
+  --mutedbg:#eeeae0;
+  --sans:'Inter',ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --serif:'Playfair Display',Georgia,serif;
+  --side-w:260px;
+  --shadow-lg:0 20px 40px -20px rgba(20,20,20,.25);
+  --shadow-sm:0 4px 14px -4px rgba(20,20,20,.12);
+  --ease:cubic-bezier(.2,.7,.2,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+img{display:block;max-width:100%;height:auto}
+
+/* =========================================================
+   LAYOUT — sidebar + main
+   ========================================================= */
+.dash{display:grid;grid-template-columns:var(--side-w) 1fr;min-height:100vh}
+.dash-side{
+  position:sticky;top:0;height:100vh;
+  background:linear-gradient(180deg,#131313 0%,#0d0d0d 100%);
+  color:#e9e4d0;
+  display:flex;flex-direction:column;
+  padding:22px 16px;
+  border-right:1px solid #000;
+  overflow:hidden; /* no scrollbar */
+}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--serif);font-size:22px;font-weight:600;letter-spacing:.02em;padding:0 6px 18px;border-bottom:1px solid #1f1f1f}
+.brand .dot{color:var(--accent);font-size:26px;line-height:1}
+.nav{display:flex;flex-direction:column;gap:2px;margin-top:14px;flex:1;min-height:0;overflow-y:auto}
+.nav::-webkit-scrollbar{width:0}
+.nav a{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:#cfcaad;font-size:14px;font-weight:500;transition:all .2s var(--ease)}
+.nav a .ico{width:22px;text-align:center;font-size:15px;color:var(--accent)}
+.nav a:hover{background:#1c1c1c;color:#fff;transform:translateX(2px)}
+.nav a.active{background:linear-gradient(90deg,#242015,#1a1710);color:var(--accent);box-shadow:inset 3px 0 0 var(--accent)}
+
+/* profile at end of navbar */
+.side-profile{
+  margin-top:14px;padding:14px;
+  background:#1a1a1a;border:1px solid #242220;border-radius:14px;
+  display:flex;align-items:center;gap:12px
+}
+.side-profile .avatar{
+  width:44px;height:44px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--accent),#e2c877);
+  color:#111;display:grid;place-items:center;font-weight:700;font-size:15px;
+  overflow:hidden;border:2px solid #2b2924
+}
+.side-profile .avatar img{width:100%;height:100%;object-fit:cover}
+.side-profile .who{min-width:0;flex:1}
+.side-profile .who strong{display:block;color:#f6f1dc;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.side-profile .who small{display:block;color:#8f8a76;font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.logout-btn{
+  margin-top:10px;width:100%;
+  padding:10px 12px;border:1px solid #2b2924;border-radius:10px;
+  color:#e9e4d0;font-size:13px;font-weight:500;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:all .2s var(--ease)
+}
+.logout-btn:hover{background:#241c14;color:var(--accent);border-color:var(--accent)}
+
+/* =========================================================
+   MAIN
+   ========================================================= */
+.dash-main{padding:32px 40px 60px;min-width:0;position:relative}
+.dash-toggle{
+  display:none;position:fixed;top:14px;left:14px;z-index:60;
+  width:42px;height:42px;border-radius:12px;
+  background:#141414;color:#fff;font-size:18px;
+  box-shadow:var(--shadow-sm)
+}
+.dash-topbar{margin-bottom:26px}
+.crumb{color:var(--accent-2);font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;margin-bottom:6px}
+.dash-topbar h1{font-family:var(--serif);font-size:34px;font-weight:600;letter-spacing:-.01em}
+.dash-topbar p{color:var(--muted);font-size:14px;margin-top:4px}
+
+/* Section transitions */
+.dash-section{display:none}
+.dash-section.active{display:block;animation:fadeUp .45s var(--ease)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+
+/* =========================================================
+   HERO STRIP with animated images
+   ========================================================= */
+.hero-strip{
+  position:relative;border-radius:20px;overflow:hidden;
+  background:#111;color:#fff;
+  margin-bottom:26px;
+  min-height:210px;
+  display:grid;grid-template-columns:1.2fr 1fr;gap:0;
+  box-shadow:var(--shadow-lg)
+}
+.hero-strip .hero-text{padding:32px;display:flex;flex-direction:column;justify-content:center;gap:10px;position:relative;z-index:2}
+.hero-strip .hero-text .kicker{color:var(--accent);font-size:11px;font-weight:600;letter-spacing:.2em;text-transform:uppercase}
+.hero-strip .hero-text h2{font-family:var(--serif);font-size:28px;font-weight:600;line-height:1.15}
+.hero-strip .hero-text p{color:#c9c4b4;font-size:14px;max-width:36ch}
+.hero-strip .hero-media{position:relative;overflow:hidden}
+.hero-strip .hero-media img{
+  width:100%;height:100%;object-fit:cover;
+  transform:scale(1.06);
+  animation:heroPan 14s var(--ease) infinite alternate;
+}
+@keyframes heroPan{from{transform:scale(1.06) translateX(0)}to{transform:scale(1.14) translateX(-4%)}}
+.hero-strip::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(90deg,#111 0%,#111 42%,rgba(17,17,17,.2) 60%,transparent 100%);
+  z-index:1;pointer-events:none
+}
+
+/* =========================================================
+   KPIs
+   ========================================================= */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.kpi{
+  background:var(--panel);border:1px solid var(--line);border-radius:14px;
+  padding:18px;position:relative;overflow:hidden;
+  transition:transform .3s var(--ease),box-shadow .3s var(--ease)
+}
+.kpi:hover{transform:translateY(-3px);box-shadow:var(--shadow-sm)}
+.kpi .lbl{color:var(--muted);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.12em}
+.kpi .val{font-family:var(--serif);font-size:32px;font-weight:600;margin:8px 0 2px}
+.kpi .sub{color:var(--muted);font-size:12px}
+.kpi::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--accent),transparent)
+}
+
+/* =========================================================
+   IMAGE CARDS with hover animation
+   ========================================================= */
+.card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:22px}
+.imgcard{
+  background:var(--panel);border:1px solid var(--line);border-radius:16px;
+  overflow:hidden;cursor:pointer;
+  transition:all .35s var(--ease)
+}
+.imgcard .media{aspect-ratio:16/10;overflow:hidden;background:#ddd8c9}
+.imgcard .media img{width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease)}
+.imgcard:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg);border-color:var(--accent)}
+.imgcard:hover .media img{transform:scale(1.08)}
+.imgcard .body{padding:14px 16px 16px}
+.imgcard .body h4{font-family:var(--serif);font-size:17px;font-weight:600;margin-bottom:4px}
+.imgcard .body p{color:var(--muted);font-size:12.5px}
+.imgcard .body .meta{display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-size:12px;color:var(--muted)}
+
+/* =========================================================
+   PANELS
+   ========================================================= */
+.panel{
+  background:var(--panel);border:1px solid var(--line);border-radius:16px;
+  padding:20px 22px;margin-bottom:18px
+}
+.panel h3{font-family:var(--serif);font-size:19px;font-weight:600;margin-bottom:4px}
+.panel .desc{color:var(--muted);font-size:13px;margin-bottom:14px}
+.panel .row{
+  display:grid;grid-template-columns:1.2fr 1fr auto;gap:14px;align-items:center;
+  padding:12px 0;border-top:1px solid var(--line);font-size:14px
+}
+.panel .row:first-of-type{border-top:0}
+.panel .row .mid{color:var(--muted);font-size:13px}
+.panel .row .end{text-align:right;white-space:nowrap}
+.panel .row strong{font-weight:600}
+
+/* tags */
+.tag{display:inline-block;font-size:11px;padding:5px 10px;border-radius:999px;font-weight:600;letter-spacing:.02em}
+.tag.ok{background:var(--okbg);color:var(--ok)}
+.tag.warn{background:var(--warnbg);color:var(--warn)}
+.tag.bad{background:var(--badbg);color:var(--bad)}
+.tag.muted{background:var(--mutedbg);color:#5a5a5a}
+
+.link{color:var(--accent-2);font-size:13px;font-weight:600;cursor:pointer}
+.link:hover{text-decoration:underline}
+
+/* =========================================================
+   FORM — settings
+   ========================================================= */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:640px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.field input{
+  padding:12px 14px;border:1px solid var(--line);border-radius:10px;
+  font:inherit;font-size:14px;background:#fff;color:var(--ink);
+  transition:border-color .2s var(--ease)
+}
+.field input:focus{outline:none;border-color:var(--accent)}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:11px 22px;border-radius:10px;
+  background:var(--ink);color:#f6f2e6;
+  font-size:13px;font-weight:600;letter-spacing:.06em;
+  transition:all .25s var(--ease)
+}
+.btn:hover{background:var(--accent-2);transform:translateY(-1px)}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.ghost:hover{background:var(--panel-2);color:var(--ink)}
+.saved-msg{margin-top:14px;font-size:13px;color:var(--ok);display:none}
+.saved-msg.show{display:block;animation:fadeUp .3s var(--ease)}
+
+/* =========================================================
+   TOAST
+   ========================================================= */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  background:#141414;color:#f5f0e0;
+  padding:12px 20px;border-radius:999px;font-size:13px;z-index:100;
+  box-shadow:var(--shadow-lg);animation:fadeUp .3s var(--ease)
+}
+
+/* Backdrop for mobile drawer */
+.side-backdrop{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:45
+}
+.side-backdrop.show{display:block}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+@media (max-width:1100px){
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+  .card-grid{grid-template-columns:repeat(2,1fr)}
+  .dash-main{padding:28px 28px 60px}
+}
+@media (max-width:820px){
+  .dash{grid-template-columns:1fr}
+  .dash-side{
+    position:fixed;top:0;left:0;height:100vh;width:280px;z-index:50;
+    transform:translateX(-100%);transition:transform .3s var(--ease)
   }
-  *{box-sizing:border-box}
-  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
-    font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Inter,sans-serif}
-  a{color:inherit;text-decoration:none}
-  button{font:inherit;cursor:pointer}
-
-  /* Layout */
-  .dash{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
-  .dash-side{background:#111;color:#f4efe0;padding:20px 16px;display:flex;flex-direction:column;gap:16px;border-right:1px solid #000}
-  .dash-main{padding:28px 36px 60px;position:relative}
-
-  /* Sidebar */
-  .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.14em;font-size:14px}
-  .brand .dot{color:var(--accent);font-size:20px}
-  .nav{display:flex;flex-direction:column;gap:2px;margin-top:6px}
-  .nav a{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:8px;color:#d8d2be;font-size:14px}
-  .nav a:hover{background:#1c1c1c;color:#fff}
-  .nav a.active{background:#242015;color:var(--accent)}
-  .side-user{margin-top:auto;background:#1a1a1a;border:1px solid #262421;border-radius:12px;padding:12px;display:flex;align-items:center;gap:10px}
-  .avatar{width:36px;height:36px;border-radius:50%;background:var(--accent);color:#111;display:grid;place-items:center;font-weight:700;font-size:13px}
-  .side-user .who{display:flex;flex-direction:column;line-height:1.2;font-size:13px}
-  .side-user .who small{color:#a49f8d;font-size:11px}
-  .side-actions{display:flex;flex-direction:column;gap:6px;margin-top:8px}
-  .side-actions button{background:transparent;border:1px solid #2a2820;color:#e7e2cf;border-radius:8px;padding:8px 10px;text-align:left;font-size:13px}
-  .side-actions button:hover{background:#1c1c1c}
-
-  /* Topbar */
-  .dash-topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:22px}
-  .crumbs{color:var(--muted);font-size:12px;letter-spacing:.08em;text-transform:uppercase}
-  .dash-topbar h1{margin:6px 0 0;font-size:30px;font-weight:600}
-  .top-user{position:relative;display:flex;align-items:center;gap:10px;background:var(--panel);
-    border:1px solid var(--line);border-radius:999px;padding:6px 12px 6px 6px;cursor:pointer}
-  .top-user .who{display:flex;flex-direction:column;line-height:1.2;font-size:13px}
-  .top-user .who small{color:var(--muted);font-size:11px}
-  .menu{position:absolute;top:52px;right:0;background:#fff;border:1px solid var(--line);
-    border-radius:12px;min-width:220px;box-shadow:0 12px 30px rgba(0,0,0,.08);padding:10px;z-index:20}
-  .menu .head{padding:8px 10px;border-bottom:1px solid var(--line);margin-bottom:6px}
-  .menu button{width:100%;text-align:left;background:transparent;border:0;padding:8px 10px;border-radius:8px;font-size:14px}
-  .menu button:hover{background:var(--bg)}
-  .dash-toggle{display:none;position:absolute;top:18px;left:18px;background:#111;color:#fff;
-    border:0;border-radius:8px;width:38px;height:38px;font-size:18px;z-index:30}
-
-  /* Panels */
-  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
-  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
-  .kpi .lbl{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.08em}
-  .kpi .val{font-size:28px;font-weight:700;margin:6px 0 2px}
-  .kpi .sub{color:var(--muted);font-size:12px}
-
-  .section{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:18px}
-  .section-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;gap:12px}
-  .section-head h3{margin:0;font-size:16px;font-weight:600}
-  .section-head p{margin:0;color:var(--muted);font-size:13px}
-  .row{display:grid;grid-template-columns:1fr 180px 120px;gap:12px;align-items:center;
-    padding:12px 0;border-top:1px solid var(--line);font-size:14px}
-  .row:first-child{border-top:0}
-  .row .mid{color:var(--muted);font-size:13px}
-  .row .end{text-align:right}
-
-  .tag{display:inline-block;font-size:11px;padding:4px 8px;border-radius:999px;font-weight:600;letter-spacing:.03em}
-  .tag.ok{background:var(--okbg);color:var(--ok)}
-  .tag.warn{background:var(--warnbg);color:var(--warn)}
-  .tag.muted{background:var(--mutedbg);color:#5a5a5a}
-
-  .link{color:#0a5cff;font-size:13px}
-  .link:hover{text-decoration:underline}
-
-  /* Modal + toast */
-  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);display:grid;place-items:center;z-index:50}
-  .modal{background:#fff;border-radius:16px;width:min(460px,92vw);padding:20px;border:1px solid var(--line)}
-  .modal header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-  .modal h3{margin:0;font-size:18px}
-  .modal .field{display:flex;flex-direction:column;gap:6px;margin:10px 0}
-  .modal label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
-  .modal input{padding:10px 12px;border:1px solid var(--line);border-radius:8px;font:inherit}
-  .modal .actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}
-  .btn{border:1px solid var(--line);background:#fff;padding:9px 14px;border-radius:8px;font-size:14px}
-  .btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}
-  .btn.ghost{background:transparent}
-  .close{background:transparent;border:0;font-size:22px;color:var(--muted)}
-
-  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
-    background:#111;color:#fff;padding:10px 16px;border-radius:999px;font-size:13px;z-index:60;
-    box-shadow:0 10px 30px rgba(0,0,0,.25)}
-
-  @media (max-width:900px){
-    .dash{grid-template-columns:1fr}
-    .dash-side{position:fixed;top:0;left:0;height:100vh;width:260px;
-      transform:translateX(-100%);transition:transform .25s ease;z-index:40}
-    .dash-side.open{transform:translateX(0)}
-    .dash-toggle{display:block}
-    .dash-main{padding:72px 20px 40px}
-    .kpi-grid{grid-template-columns:repeat(2,1fr)}
-    .row{grid-template-columns:1fr auto}
-    .row .mid{grid-column:1/-1;font-size:12px}
-    .dash-topbar h1{font-size:24px}
-  }
+  .dash-side.open{transform:translateX(0)}
+  .dash-toggle{display:grid;place-items:center}
+  .dash-main{padding:70px 20px 40px}
+  .dash-topbar h1{font-size:26px}
+  .hero-strip{grid-template-columns:1fr;min-height:0}
+  .hero-strip .hero-media{height:160px;order:-1}
+  .hero-strip::after{background:linear-gradient(180deg,transparent 0%,rgba(17,17,17,.4) 60%,#111 100%)}
+  .hero-strip .hero-text{padding:22px}
+  .hero-strip .hero-text h2{font-size:22px}
+  .card-grid{grid-template-columns:1fr;gap:14px}
+  .panel .row{grid-template-columns:1fr auto;row-gap:4px}
+  .panel .row .mid{grid-column:1/-1;order:3}
+  .form-grid{grid-template-columns:1fr}
+}
+@media (max-width:480px){
+  .kpi-grid{grid-template-columns:1fr 1fr;gap:10px}
+  .kpi .val{font-size:26px}
+  .dash-main{padding:66px 14px 40px}
+  .panel{padding:16px}
+}
 </style>
 </head>
 <body>
+
+<button class="dash-toggle" aria-label="Toggle menu" onclick="toggleSide()">☰</button>
+<div class="side-backdrop" id="backdrop" onclick="toggleSide()"></div>
+
 <div class="dash">
+  <!-- ============= SIDEBAR ============= -->
   <aside class="dash-side" id="side">
     <div class="brand"><span class="dot">◆</span> STACKLY</div>
-    <nav class="nav" id="nav"></nav>
-    <div class="side-user">
-      <div class="avatar" id="sideAvatar">AM</div>
-      <div class="who"><strong id="sideName">Alex Morgan</strong><small id="sideEmail">alex@stackly.co</small></div>
+
+    <nav class="nav" id="nav">
+      <a href="#overview"  data-target="overview"  class="active"><span class="ico">◐</span><span>Overview</span></a>
+      <a href="#bookings"  data-target="bookings"><span class="ico">▤</span><span>My Bookings</span></a>
+      <a href="#rooms"     data-target="rooms"><span class="ico">▣</span><span>Meeting Rooms</span></a>
+      <a href="#events"    data-target="events"><span class="ico">✦</span><span>Events</span></a>
+      <a href="#billing"   data-target="billing"><span class="ico">◈</span><span>Billing</span></a>
+      <a href="#community" data-target="community"><span class="ico">◉</span><span>Community</span></a>
+      <a href="#profile"   data-target="profile"><span class="ico">☺</span><span>Profile</span></a>
+      <a href="#settings"  data-target="settings"><span class="ico">⚙</span><span>Settings</span></a>
+    </nav>
+
+    <div class="side-profile">
+      <div class="avatar" id="sideAvatar">
+        <img id="sideAvatarImg" src="./images/person-1.webp" alt="You" />
+      </div>
+      <div class="who">
+        <strong id="sideName">Alex Morgan</strong>
+        <small id="sideEmail">alex@stackly.co</small>
+      </div>
     </div>
-    <div class="side-actions">
-      <button onclick="openSettings()">⚙  Settings</button>
-      <button onclick="logout()">↪  Log out</button>
-    </div>
+    <button class="logout-btn" onclick="logout()"><span>↪</span> Log out</button>
   </aside>
 
+  <!-- ============= MAIN ============= -->
   <main class="dash-main">
-    <button class="dash-toggle" onclick="toggleSide()">☰</button>
     <div class="dash-topbar">
-      <div>
-        <div class="crumbs" id="crumbs">User · Dashboard · Overview</div>
-        <h1 id="welcome">Welcome back, Alex.</h1>
-      </div>
-      <div class="top-user" onclick="toggleMenu(event)">
-        <div class="avatar" id="topAvatar">AM</div>
-        <div class="who"><strong id="topName">Alex Morgan</strong><small id="topEmail">alex@stackly.co</small></div>
-        <div id="menu" class="menu" style="display:none" onclick="event.stopPropagation()">
-          <div class="head">
-            <div><strong id="menuName">Alex Morgan</strong></div>
-            <small id="menuEmail" style="color:var(--muted)">alex@stackly.co</small>
-          </div>
-          <button onclick="openSettings()">⚙  Settings</button>
-          <button onclick="logout()">↪  Log out</button>
-        </div>
-      </div>
+      <div class="crumb" id="crumb">Member · Dashboard · Overview</div>
+      <h1 id="pageTitle">Welcome back, Alex.</h1>
+      <p id="pageSub">Here's what's happening in your workspace today.</p>
     </div>
 
-    <div id="content"></div>
+    <!-- ================ OVERVIEW ================ -->
+    <section class="dash-section active" data-section="overview">
+      <div class="hero-strip">
+        <div class="hero-text">
+          <span class="kicker">Today at STACKLY</span>
+          <h2>Your rooftop lounge reopens Friday.</h2>
+          <p>Complimentary espresso all week to celebrate. Reserve a seat before it fills up.</p>
+        </div>
+        <div class="hero-media"><img src="./images/hero-home.webp" alt="Workspace" /></div>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi"><div class="lbl">Hours this week</div><div class="val">32</div><div class="sub">+12% vs last week</div></div>
+        <div class="kpi"><div class="lbl">Rooms booked</div><div class="val">4</div><div class="sub">This month</div></div>
+        <div class="kpi"><div class="lbl">Guest visits</div><div class="val">7</div><div class="sub">+2 this week</div></div>
+        <div class="kpi"><div class="lbl">Credits left</div><div class="val">18</div><div class="sub">of 24 hours</div></div>
+      </div>
+
+      <div class="panel">
+        <h3>Today's schedule</h3>
+        <p class="desc">Everything on for you today</p>
+        <div class="row"><strong>Hot Desk · Level 2</strong><div class="mid">All day access</div><div class="end"><span class="tag ok">Active</span></div></div>
+        <div class="row"><strong>Oak Room</strong><div class="mid">10:00 – 11:00 · Team sync</div><div class="end"><span class="tag ok">Confirmed</span></div></div>
+        <div class="row"><strong>Phone Booth · 3</strong><div class="mid">14:00 – 14:30 · Client call</div><div class="end"><span class="tag warn">Starts soon</span></div></div>
+        <div class="row"><strong>Rooftop Lounge</strong><div class="mid">18:00 – late · Members drinks</div><div class="end"><span class="tag muted">Optional</span></div></div>
+      </div>
+
+      <div class="panel">
+        <h3>Quick actions</h3>
+        <p class="desc">Common member tasks</p>
+        <div class="row"><strong>Book a meeting room</strong><div class="mid">Real-time availability</div><div class="end"><span class="link" data-toast="Booking flow opened">Open →</span></div></div>
+        <div class="row"><strong>Invite a guest</strong><div class="mid">Send a day pass</div><div class="end"><span class="link" data-toast="Guest invite sent">Send →</span></div></div>
+        <div class="row"><strong>Reserve event space</strong><div class="mid">Weekend availability open</div><div class="end"><span class="link" data-toast="Event browser opened">Browse →</span></div></div>
+      </div>
+    </section>
+
+    <!-- ================ BOOKINGS ================ -->
+    <section class="dash-section" data-section="bookings">
+      <div class="card-grid">
+        <div class="imgcard"><div class="media"><img src="./images/workspace-1.webp" alt=""/></div>
+          <div class="body"><h4>Oak Meeting Room</h4><p>Tue · 10:00 – 11:00</p><div class="meta"><span>6 seats · Level 2</span><span class="tag ok">Confirmed</span></div></div></div>
+        <div class="imgcard"><div class="media"><img src="./images/workspace-2.webp" alt=""/></div>
+          <div class="body"><h4>Phone Booth 3</h4><p>Wed · 14:00 – 14:30</p><div class="meta"><span>1 seat · Level 1</span><span class="tag ok">Confirmed</span></div></div></div>
+        <div class="imgcard"><div class="media"><img src="./images/workspace-3.webp" alt=""/></div>
+          <div class="body"><h4>Studio A</h4><p>Fri · 16:00 – 18:00</p><div class="meta"><span>12 seats · Level 3</span><span class="tag warn">Pending</span></div></div></div>
+      </div>
+
+      <div class="panel">
+        <h3>Waitlist</h3>
+        <p class="desc">Requested, not yet confirmed</p>
+        <div class="row"><strong>Cedar Room · 10 seats</strong><div class="mid">Mon 09:00 – 10:30</div><div class="end"><span class="tag muted">Waiting</span></div></div>
+        <div class="row"><strong>Rooftop Lounge</strong><div class="mid">Sun 18:00 – 21:00</div><div class="end"><span class="tag muted">Waiting</span></div></div>
+        <div class="row"><strong>Podcast Studio</strong><div class="mid">Thu 13:00 – 15:00</div><div class="end"><span class="tag muted">Waiting</span></div></div>
+      </div>
+
+      <div class="panel">
+        <h3>Booking history</h3>
+        <p class="desc">Recently completed</p>
+        <div class="row"><strong>Oak Room</strong><div class="mid">Mar 22 · 90 minutes</div><div class="end"><span class="tag muted">Completed</span></div></div>
+        <div class="row"><strong>Phone Booth · 1</strong><div class="mid">Mar 18 · 30 minutes</div><div class="end"><span class="tag muted">Completed</span></div></div>
+        <div class="row"><strong>Studio B</strong><div class="mid">Mar 12 · 120 minutes</div><div class="end"><span class="link" data-toast="Booking re-requested">Rebook →</span></div></div>
+      </div>
+    </section>
+
+    <!-- ================ ROOMS ================ -->
+    <section class="dash-section" data-section="rooms">
+      <div class="card-grid">
+        <div class="imgcard"><div class="media"><img src="./images/workspace-4.webp" alt=""/></div>
+          <div class="body"><h4>Oak Room</h4><p>6 seats · Whiteboard · TV</p><div class="meta"><span class="tag ok">Available</span><span class="link" data-toast="Room booked: Oak Room">Book →</span></div></div></div>
+        <div class="imgcard"><div class="media"><img src="./images/g1.webp" alt=""/></div>
+          <div class="body"><h4>Cedar Room</h4><p>10 seats · Video conf · Coffee</p><div class="meta"><span class="tag ok">Available</span><span class="link" data-toast="Room booked: Cedar Room">Book →</span></div></div></div>
+        <div class="imgcard"><div class="media"><img src="./images/g2.webp" alt=""/></div>
+          <div class="body"><h4>Birch Room</h4><p>4 seats · Quiet zone</p><div class="meta"><span class="tag ok">Available</span><span class="link" data-toast="Room booked: Birch Room">Book →</span></div></div></div>
+        <div class="imgcard"><div class="media"><img src="./images/g3.webp" alt=""/></div>
+          <div class="body"><h4>Studio A</h4><p>12 seats · Podcast rig</p><div class="meta"><span class="tag warn">In use</span><span class="tag muted">—</span></div></div></div>
+        <div class="imgcard"><div class="media"><img src="./images/g4.webp" alt=""/></div>
+          <div class="body"><h4>Studio B</h4><p>8 seats · Natural light</p><div class="meta"><span class="tag ok">Available</span><span class="link" data-toast="Room booked: Studio B">Book →</span></div></div></div>
+        <div class="imgcard"><div class="media"><img src="./images/g5.webp" alt=""/></div>
+          <div class="body"><h4>Podcast Studio</h4><p>2 mics · Soundproofed</p><div class="meta"><span class="tag ok">Available</span><span class="link" data-toast="Room booked: Podcast Studio">Book →</span></div></div></div>
+      </div>
+    </section>
+
+    <!-- ================ EVENTS ================ -->
+    <section class="dash-section" data-section="events">
+      <div class="card-grid">
+        <div class="imgcard"><div class="media"><img src="./images/blog-1.webp" alt=""/></div>
+          <div class="body"><h4>Design Critique Night</h4><p>Wed · 18:00 – 20:00</p><div class="meta"><span>Level 2 lounge</span><span class="link" data-toast="RSVP confirmed: Design Critique">RSVP →</span></div></div></div>
+        <div class="imgcard"><div class="media"><img src="./images/blog-2.webp" alt=""/></div>
+          <div class="body"><h4>Members Dinner</h4><p>Fri · 20:00 – 22:30</p><div class="meta"><span>Rooftop</span><span class="link" data-toast="RSVP confirmed: Members Dinner">RSVP →</span></div></div></div>
+        <div class="imgcard"><div class="media"><img src="./images/blog-3.webp" alt=""/></div>
+          <div class="body"><h4>Morning Yoga</h4><p>Sat · 08:00 – 09:00</p><div class="meta"><span>Wellness room</span><span class="link" data-toast="RSVP confirmed: Yoga">RSVP →</span></div></div></div>
+      </div>
+
+      <div class="panel">
+        <h3>Workshops</h3>
+        <p class="desc">Learn something new</p>
+        <div class="row"><strong>Intro to Product Strategy</strong><div class="mid">Mon 17:00 · 2 hrs</div><div class="end"><span class="link" data-toast="RSVP: Product Strategy">RSVP →</span></div></div>
+        <div class="row"><strong>Freelance Finance 101</strong><div class="mid">Thu 12:30 · Lunch & learn</div><div class="end"><span class="link" data-toast="RSVP: Freelance Finance">RSVP →</span></div></div>
+        <div class="row"><strong>Founders Roundtable</strong><div class="mid">Fri 09:00 · Members only</div><div class="end"><span class="link" data-toast="RSVP: Founders Roundtable">RSVP →</span></div></div>
+      </div>
+    </section>
+
+    <!-- ================ BILLING ================ -->
+    <section class="dash-section" data-section="billing">
+      <div class="kpi-grid">
+        <div class="kpi"><div class="lbl">Plan</div><div class="val">Studio</div><div class="sub">$399 / month</div></div>
+        <div class="kpi"><div class="lbl">Next invoice</div><div class="val">Apr 1</div><div class="sub">Auto-charge on file</div></div>
+        <div class="kpi"><div class="lbl">Room credits</div><div class="val">18</div><div class="sub">of 24 hours</div></div>
+        <div class="kpi"><div class="lbl">Guest passes</div><div class="val">3</div><div class="sub">of 5 used</div></div>
+      </div>
+
+      <div class="panel">
+        <h3>Invoices</h3>
+        <p class="desc">Recent charges</p>
+        <div class="row"><strong>March 2026</strong><div class="mid">$399.00 · Studio plan</div><div class="end"><span class="tag ok">Paid</span></div></div>
+        <div class="row"><strong>February 2026</strong><div class="mid">$399.00 · Studio plan</div><div class="end"><span class="tag ok">Paid</span></div></div>
+        <div class="row"><strong>January 2026</strong><div class="mid">$399.00 · Studio plan</div><div class="end"><span class="tag ok">Paid</span></div></div>
+      </div>
+
+      <div class="panel">
+        <h3>Payment methods</h3>
+        <p class="desc">Cards on file</p>
+        <div class="row"><strong>Visa · •••• 4242</strong><div class="mid">Expires 09/28</div><div class="end"><span class="tag ok">Default</span></div></div>
+        <div class="row"><strong>Mastercard · •••• 1177</strong><div class="mid">Expires 03/27</div><div class="end"><span class="link" data-toast="Set as default">Make default →</span></div></div>
+        <div class="row"><strong>Add a new card</strong><div class="mid">Secured by Stripe</div><div class="end"><span class="link" data-toast="Add card flow">Add →</span></div></div>
+      </div>
+    </section>
+
+    <!-- ================ COMMUNITY ================ -->
+    <section class="dash-section" data-section="community">
+      <div class="hero-strip">
+        <div class="hero-text">
+          <span class="kicker">This week at STACKLY</span>
+          <h2>Say hi to 6 new members joining across our floors.</h2>
+          <p>Meet designers, engineers, and founders shaping what's next.</p>
+        </div>
+        <div class="hero-media"><img src="./images/team.webp" alt="Community"/></div>
+      </div>
+
+      <div class="card-grid">
+        <div class="imgcard"><div class="media"><img src="./images/person-1.webp" alt=""/></div>
+          <div class="body"><h4>Priya Shah</h4><p>Design studio · Joined this week</p><div class="meta"><span>Level 3</span><span class="link" data-toast="Hello sent to Priya">Say hi →</span></div></div></div>
+        <div class="imgcard"><div class="media"><img src="./images/person-2.webp" alt=""/></div>
+          <div class="body"><h4>Marcus Lee</h4><p>Product engineer · SF</p><div class="meta"><span>Level 2</span><span class="link" data-toast="Hello sent to Marcus">Say hi →</span></div></div></div>
+        <div class="imgcard"><div class="media"><img src="./images/g6.webp" alt=""/></div>
+          <div class="body"><h4>Aya Nakamura</h4><p>Freelance illustrator · LDN</p><div class="meta"><span>Hot Desk</span><span class="link" data-toast="Hello sent to Aya">Say hi →</span></div></div></div>
+      </div>
+
+      <div class="panel">
+        <h3>Announcements</h3>
+        <p class="desc">Fresh from the community team</p>
+        <div class="row"><strong>Coffee bar restocked</strong><div class="mid">Level 1 · New Ethiopian roast</div><div class="end"><span class="tag ok">Fresh</span></div></div>
+        <div class="row"><strong>Rooftop reopens Friday</strong><div class="mid">Members only · RSVP</div><div class="end"><span class="link" data-toast="RSVP confirmed">RSVP →</span></div></div>
+        <div class="row"><strong>Wellness week starts Mon</strong><div class="mid">Yoga · Meditation · Massage</div><div class="end"><span class="tag muted">Free</span></div></div>
+      </div>
+    </section>
+
+    <!-- ================ PROFILE ================ -->
+    <section class="dash-section" data-section="profile">
+      <div class="panel">
+        <h3>Account details</h3>
+        <p class="desc">Your STACKLY member profile</p>
+        <div class="row"><strong>Name</strong><div class="mid" id="profName">—</div><div class="end"></div></div>
+        <div class="row"><strong>Email</strong><div class="mid" id="profEmail">—</div><div class="end"></div></div>
+        <div class="row"><strong>Membership</strong><div class="mid">Studio plan · Since Jan 2024</div><div class="end"><span class="tag ok">Active</span></div></div>
+        <div class="row"><strong>Home floor</strong><div class="mid">Level 2 · Quiet zone</div><div class="end"><span class="tag ok">Saved</span></div></div>
+      </div>
+
+      <div class="panel">
+        <h3>Preferences</h3>
+        <p class="desc">Personalise your experience</p>
+        <div class="row"><strong>Email notifications</strong><div class="mid">Bookings, events, invoices</div><div class="end"><span class="tag ok">On</span></div></div>
+        <div class="row"><strong>Calendar sync</strong><div class="mid">Google · connected</div><div class="end"><span class="tag ok">Active</span></div></div>
+        <div class="row"><strong>Two-factor auth</strong><div class="mid">Extra login security</div><div class="end"><span class="tag warn">Off</span></div></div>
+      </div>
+    </section>
+
+    <!-- ================ SETTINGS ================ -->
+    <section class="dash-section" data-section="settings">
+      <div class="panel">
+        <h3>Account settings</h3>
+        <p class="desc">Synced with this browser's local storage</p>
+        <div class="form-grid">
+          <div class="field"><label for="fName">Full name</label><input id="fName" type="text" placeholder="Your name"/></div>
+          <div class="field"><label for="fEmail">Email</label><input id="fEmail" type="email" placeholder="you@example.com"/></div>
+        </div>
+        <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn" id="saveBtn">Save changes</button>
+          <button class="btn ghost" onclick="location.reload()">Cancel</button>
+        </div>
+        <div class="saved-msg" id="savedMsg">Saved — your name and email were updated.</div>
+      </div>
+
+      <div class="panel">
+        <h3>Security</h3>
+        <p class="desc">Keep your account safe</p>
+        <div class="row"><strong>Password</strong><div class="mid">Last changed 42 days ago</div><div class="end"><span class="link" data-toast="Password flow">Update →</span></div></div>
+        <div class="row"><strong>Two-factor auth</strong><div class="mid">Not enabled</div><div class="end"><span class="tag warn">Recommended</span></div></div>
+        <div class="row"><strong>Active sessions</strong><div class="mid">2 devices signed in</div><div class="end"><span class="link" data-toast="Session manager">Manage →</span></div></div>
+      </div>
+    </section>
+
   </main>
 </div>
 
-<div id="modalHost"></div>
 <div id="toastHost"></div>
 
 <script>
-/* ---------- state ---------- */
-const DEFAULT_USER = { name:"Alex Morgan", email:"alex@stackly.co", role:"user" };
-let user = loadUser();
-let active = "overview";
+/* =========================================================
+   READ USER FROM LOCALSTORAGE
+   Accepts several shapes:
+   - localStorage.user = '{"name":"...","email":"...","avatar":"..."}'
+   - localStorage.username / name
+   - localStorage.email
+   - localStorage.avatar (URL)
+   ========================================================= */
+const DEFAULT_USER = { name:"Alex Morgan", email:"alex@stackly.co", avatar:"./images/person-1.webp" };
 
-const NAV = [
-  { key:"overview", label:"Overview",     ico:"◐" },
-  { key:"bookings", label:"My Bookings",  ico:"▤" },
-  { key:"rooms",    label:"Meeting Rooms",ico:"▣" },
-  { key:"events",   label:"Events",       ico:"✦" },
-  { key:"billing",  label:"Billing",      ico:"◈" },
-  { key:"profile",  label:"Profile",      ico:"◉" },
-];
-
-function loadUser(){
-  try{ const raw = localStorage.getItem("stackly.user");
-    if(raw) return {...DEFAULT_USER, ...JSON.parse(raw)}; }catch(e){}
-  return {...DEFAULT_USER};
+function readStoredUser(){
+  let u = {...DEFAULT_USER};
+  try{
+    const raw = localStorage.getItem("user") || localStorage.getItem("stackly.user");
+    if(raw){ const p = JSON.parse(raw);
+      u.name   = p.name   || p.fullName || p.username || u.name;
+      u.email  = p.email  || u.email;
+      u.avatar = p.avatar || p.photo    || u.avatar;
+    }
+  }catch(e){}
+  u.name   = localStorage.getItem("username") || localStorage.getItem("name")   || u.name;
+  u.email  = localStorage.getItem("email")    || u.email;
+  u.avatar = localStorage.getItem("avatar")   || u.avatar;
+  return u;
 }
 function initials(n){ return n.split(" ").map(s=>s[0]).filter(Boolean).slice(0,2).join("").toUpperCase(); }
-
-/* ---------- render ---------- */
-function renderNav(){
-  const n = document.getElementById("nav");
-  n.innerHTML = NAV.map(x=>`<a href="#" data-k="${x.key}" class="${x.key===active?'active':''}">
-      <span>${x.ico}</span><span>${x.label}</span></a>`).join("");
-  n.querySelectorAll("a").forEach(a=>a.addEventListener("click",e=>{
-    e.preventDefault(); active = a.dataset.k; document.getElementById("side").classList.remove("open");
-    render();
-  }));
+function applyUser(u){
+  document.getElementById("sideName").textContent  = u.name;
+  document.getElementById("sideEmail").textContent = u.email;
+  document.getElementById("profName").textContent  = u.name;
+  document.getElementById("profEmail").textContent = u.email;
+  const img = document.getElementById("sideAvatarImg");
+  if(u.avatar){ img.src = u.avatar; img.style.display="block"; }
+  else{ img.style.display="none"; document.getElementById("sideAvatar").textContent = initials(u.name); }
+  document.getElementById("pageTitle").textContent = "Welcome back, " + u.name.split(" ")[0] + ".";
+  document.getElementById("fName").value  = u.name;
+  document.getElementById("fEmail").value = u.email;
 }
-function renderHeader(){
-  const first = user.name.split(" ")[0];
-  const lbl = NAV.find(n=>n.key===active).label;
-  document.getElementById("crumbs").textContent = `User · Dashboard · ${lbl}`;
-  document.getElementById("welcome").textContent = `Welcome back, ${first}.`;
-  const ini = initials(user.name);
-  ["sideAvatar","topAvatar"].forEach(id=>document.getElementById(id).textContent=ini);
-  ["sideName","topName","menuName"].forEach(id=>document.getElementById(id).textContent=user.name);
-  ["sideEmail","topEmail","menuEmail"].forEach(id=>document.getElementById(id).textContent=user.email);
-}
-function render(){ renderNav(); renderHeader(); document.getElementById("content").innerHTML = modules[active](); bindActions(); }
 
-/* ---------- helpers ---------- */
-const tag = (k,t)=>`<span class="tag ${k}">${t}</span>`;
-const row = (a,b,c)=>`<div class="row"><div>${a}</div><div class="mid">${b}</div><div class="end">${c}</div></div>`;
-const section = (title,sub,body)=>`
-  <section class="section">
-    <div class="section-head"><div><h3>${title}</h3>${sub?`<p>${sub}</p>`:""}</div></div>
-    ${body}
-  </section>`;
-const kpi = (l,v,s)=>`<div class="kpi"><div class="lbl">${l}</div><div class="val">${v}</div><div class="sub">${s}</div></div>`;
-const act = (msg,text="Action")=>`<a href="#" class="link" data-toast="${msg}">${text}</a>`;
-
-/* ---------- modules ---------- */
-const modules = {
-  overview: () => `
-    <div class="kpi-grid">
-      ${kpi("Hours this week","32","+12% vs last")}
-      ${kpi("Rooms Booked","4","This month")}
-      ${kpi("Guest Visits","7","+2 this week")}
-      ${kpi("Credits Left","18","of 24 hrs")}
-    </div>
-    ${section("Today","What's on for you today",
-      row("Hot Desk · Level 2","All day",tag("ok","Active"))+
-      row("Oak Room","10:00 – 11:00",tag("ok","Confirmed"))+
-      row("Phone Booth · 3","14:00 – 14:30",tag("warn","Starts soon"))
-    )}
-    ${section("Quick actions","Common member tasks",
-      row("Book a meeting room","Real-time availability",act("Booking flow opened","Open"))+
-      row("Invite a guest","Send a day pass",act("Guest invite sent","Send"))+
-      row("Reserve event space","Weekend availability",act("Event browser opened","Browse"))
-    )}
-    ${section("Community","This week at STACKLY",
-      row("New member: Priya Shah","Design studio",act("Hello sent","Say hi"))+
-      row("Coffee bar restocked","Level 1",tag("ok","Fresh"))+
-      row("Rooftop reopens Friday","Members only",act("RSVP confirmed","RSVP"))
-    )}`,
-
-  bookings: () => `
-    ${section("Upcoming","Your next reservations",
-      row("Meeting Room · Oak","Tue 10:00 – 11:00",tag("ok","Confirmed"))+
-      row("Phone Booth · 3","Wed 14:00 – 14:30",tag("ok","Confirmed"))+
-      row("Studio A","Fri 16:00 – 18:00",tag("warn","Pending"))+
-      row("Event Space","Sat 19:00 – 22:00",tag("ok","Confirmed"))
-    )}
-    ${section("Waitlist","Requested but not yet confirmed",
-      row("Cedar Room · 10 seats","Mon 09:00 – 10:30",tag("muted","Waiting"))+
-      row("Rooftop Lounge","Sun 18:00 – 21:00",tag("muted","Waiting"))+
-      row("Podcast Studio","Thu 13:00 – 15:00",tag("muted","Waiting"))
-    )}
-    ${section("History","Recently completed",
-      row("Oak Room","Mar 22",tag("muted","Completed"))+
-      row("Phone Booth · 1","Mar 18",tag("muted","Completed"))+
-      row("Studio B","Mar 12",act("Booking re-requested","Rebook"))
-    )}`,
-
-  rooms: () => `
-    ${section("Meeting Rooms","Bookable rooms",
-      row("Oak Room · 6 seats",tag("ok","Available"),act("Room booked: Oak Room","Book"))+
-      row("Cedar Room · 10 seats",tag("ok","Available"),act("Room booked: Cedar Room","Book"))+
-      row("Birch Room · 4 seats",tag("ok","Available"),act("Room booked: Birch Room","Book"))
-    )}
-    ${section("Phone Booths","For quick calls",
-      row("Booth · 1",tag("ok","Available"),act("Room booked: Booth 1","Book"))+
-      row("Booth · 2",tag("warn","In use"),tag("warn","Busy"))+
-      row("Booth · 3",tag("ok","Available"),act("Room booked: Booth 3","Book"))
-    )}
-    ${section("Studios","Creative spaces",
-      row("Studio A · 12 seats",tag("warn","Busy"),tag("muted","Unavailable"))+
-      row("Studio B · 8 seats",tag("ok","Available"),act("Room booked: Studio B","Book"))+
-      row("Podcast Studio",tag("ok","Available"),act("Room booked: Podcast Studio","Book"))
-    )}`,
-
-  events: () => `
-    ${section("This week","Community events",
-      row("Wednesday Workshop: Design Critique","Wed 18:00",act("RSVP confirmed for: Design Critique","RSVP"))+
-      row("Members Dinner","Fri 20:00",act("RSVP confirmed for: Members Dinner","RSVP"))+
-      row("Morning Yoga","Sat 08:00",act("RSVP confirmed for: Morning Yoga","RSVP"))
-    )}
-    ${section("Workshops","Learn something new",
-      row("Intro to Product Strategy","Mon 17:00",act("RSVP confirmed for: Product Strategy","RSVP"))+
-      row("Freelance Finance 101","Thu 12:30",act("RSVP confirmed for: Freelance Finance","RSVP"))+
-      row("Founders Roundtable","Fri 09:00",act("RSVP confirmed for: Founders Roundtable","RSVP"))
-    )}
-    ${section("Past events","Catch up",
-      row("Brand Storytelling Panel","Mar 20",act("Opening recording…","Watch"))+
-      row("Members Mixer · March","Mar 07",act("Gallery opened","Gallery"))+
-      row("Coffee Cupping","Feb 24",act("Notes opened","Notes"))
-    )}`,
-
-  billing: () => `
-    ${section("Invoices","Recent charges",
-      row("March 2026","$399.00",tag("ok","Paid"))+
-      row("February 2026","$399.00",tag("ok","Paid"))+
-      row("January 2026","$399.00",tag("ok","Paid"))
-    )}
-    ${section("Payment methods","Cards on file",
-      row("Visa · •••• 4242","Expires 09/28",tag("ok","Default"))+
-      row("Mastercard · •••• 1177","Expires 03/27",act("Set as default","Make default"))+
-      row("Add a new card","Secured by Stripe",act("Add card flow opened","Add"))
-    )}
-    ${section("Usage","This billing cycle",
-      row("Meeting-room credits","18 / 24 hrs",tag("ok","On track"))+
-      row("Guest passes","3 / 5 used",tag("warn","Low"))+
-      row("Printing quota","82 / 200 pages",tag("ok","Healthy"))
-    )}`,
-
-  profile: () => `
-    ${section("Account","Your details",
-      row("Name",user.name,"")+
-      row("Email",user.email,"")+
-      row("Role",user.role,"")+
-      row("Edit profile","Update name, email, avatar",`<a href="#" class="link" onclick="openSettings();return false;">Open</a>`)
-    )}
-    ${section("Preferences","Personalise your experience",
-      row("Email notifications","Bookings, events, invoices",tag("ok","On"))+
-      row("Preferred floor","Level 2 · Quiet zone",tag("ok","Saved"))+
-      row("Calendar sync","Google · connected",tag("ok","Active"))
-    )}
-    ${section("Security","Keep your account safe",
-      row("Password","Last changed 42 days ago",act("Password flow opened","Update"))+
-      row("Two-factor auth","Not enabled",tag("warn","Recommended"))+
-      row("Active sessions","2 devices",act("Session manager opened","Manage"))
-    )}`,
+/* =========================================================
+   MODULE SWITCHING
+   ========================================================= */
+const TITLES = {
+  overview :{t:"Welcome back, {first}.", s:"Here's what's happening in your workspace today.", c:"Overview"},
+  bookings :{t:"My bookings",             s:"Every reservation you have — past, upcoming, waitlisted.", c:"Bookings"},
+  rooms    :{t:"Meeting rooms",           s:"Find a space that fits — book in one click.",              c:"Rooms"},
+  events   :{t:"Community events",        s:"Workshops, dinners, and gatherings this week.",            c:"Events"},
+  billing  :{t:"Billing & plan",          s:"Invoices, credits, and payment methods.",                  c:"Billing"},
+  community:{t:"The community",           s:"New faces, shared spaces, and what's on.",                 c:"Community"},
+  profile  :{t:"Your profile",            s:"How the rest of STACKLY sees you.",                        c:"Profile"},
+  settings :{t:"Settings",                s:"Update your details and account preferences.",             c:"Settings"}
 };
-
-function bindActions(){
-  document.querySelectorAll("[data-toast]").forEach(el=>{
-    el.addEventListener("click",e=>{e.preventDefault();showToast(el.dataset.toast);});
-  });
+function showSection(name, first){
+  document.querySelectorAll(".dash-section").forEach(s=>s.classList.toggle("active", s.dataset.section===name));
+  document.querySelectorAll(".nav a").forEach(a=>a.classList.toggle("active", a.dataset.target===name));
+  const cfg = TITLES[name] || TITLES.overview;
+  document.getElementById("pageTitle").textContent = cfg.t.replace("{first}", first);
+  document.getElementById("pageSub").textContent   = cfg.s;
+  document.getElementById("crumb").textContent     = "Member · Dashboard · " + cfg.c;
+  if(history.replaceState) history.replaceState(null,"","#"+name);
+  document.getElementById("side").classList.remove("open");
+  document.getElementById("backdrop").classList.remove("show");
+  window.scrollTo({top:0,behavior:"smooth"});
 }
 
-/* ---------- interactions ---------- */
-function toggleSide(){ document.getElementById("side").classList.toggle("open"); }
-function toggleMenu(e){ e.stopPropagation();
-  const m=document.getElementById("menu"); m.style.display = m.style.display==="none"?"block":"none"; }
-document.addEventListener("click",()=>{document.getElementById("menu").style.display="none";});
+document.querySelectorAll(".nav a[data-target]").forEach(a=>{
+  a.addEventListener("click",e=>{ e.preventDefault(); showSection(a.dataset.target, currentUser.name.split(" ")[0]); });
+});
 
-function logout(){
-  try{ localStorage.removeItem("stackly.user"); localStorage.removeItem("stackly.token"); }catch(e){}
-  showToast("Logged out");
-  setTimeout(()=>{ window.location.href = "/"; }, 500);
+/* =========================================================
+   TOAST / ACTIONS / MOBILE / LOGOUT
+   ========================================================= */
+function toggleSide(){
+  const s = document.getElementById("side");
+  const b = document.getElementById("backdrop");
+  s.classList.toggle("open"); b.classList.toggle("show");
 }
-
-function openSettings(){
-  document.getElementById("menu").style.display="none";
-  const host = document.getElementById("modalHost");
-  host.innerHTML = `
-    <div class="modal-bg" onclick="closeSettings()">
-      <div class="modal" onclick="event.stopPropagation()">
-        <header><h3>Settings</h3><button class="close" onclick="closeSettings()">×</button></header>
-        <div class="field"><label>Full name</label><input id="fName" value="${escapeHtml(user.name)}"/></div>
-        <div class="field"><label>Email</label><input id="fEmail" value="${escapeHtml(user.email)}"/></div>
-        <div class="actions">
-          <button class="btn ghost" onclick="closeSettings()">Cancel</button>
-          <button class="btn primary" onclick="saveSettings()">Save changes</button>
-        </div>
-      </div>
-    </div>`;
-}
-function closeSettings(){ document.getElementById("modalHost").innerHTML=""; }
-function saveSettings(){
-  const n=document.getElementById("fName").value.trim()||user.name;
-  const e=document.getElementById("fEmail").value.trim()||user.email;
-  user = {...user, name:n, email:e};
-  try{ localStorage.setItem("stackly.user", JSON.stringify(user)); }catch(_){}
-  closeSettings(); render(); showToast("Settings saved");
-}
-function escapeHtml(s){ return s.replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
-
 let toastTimer;
 function showToast(msg){
   const host = document.getElementById("toastHost");
-  host.innerHTML = `<div class="toast">${escapeHtml(msg)}</div>`;
+  host.innerHTML = `<div class="toast">${msg}</div>`;
   clearTimeout(toastTimer);
   toastTimer = setTimeout(()=>host.innerHTML="", 2200);
 }
+document.addEventListener("click", e=>{
+  const t = e.target.closest("[data-toast]");
+  if(t){ e.preventDefault(); showToast(t.dataset.toast); }
+});
 
-render();
+function logout(){
+  try{
+    ["user","stackly.user","stackly.token","username","name","email","avatar"].forEach(k=>localStorage.removeItem(k));
+  }catch(e){}
+  showToast("Logged out");
+  setTimeout(()=>{ window.location.href = "/login.html"; }, 500);
+}
+
+/* =========================================================
+   SETTINGS SAVE
+   ========================================================= */
+document.getElementById("saveBtn").addEventListener("click", ()=>{
+  const name  = document.getElementById("fName").value.trim();
+  const email = document.getElementById("fEmail").value.trim();
+  if(name)  { localStorage.setItem("username", name); localStorage.setItem("name", name); }
+  if(email) { localStorage.setItem("email", email); }
+  try{
+    const existing = JSON.parse(localStorage.getItem("user")||"{}");
+    existing.name  = name  || existing.name;
+    existing.email = email || existing.email;
+    localStorage.setItem("user", JSON.stringify(existing));
+  }catch(e){ localStorage.setItem("user", JSON.stringify({name,email})); }
+  currentUser = readStoredUser();
+  applyUser(currentUser);
+  const m = document.getElementById("savedMsg");
+  m.classList.add("show");
+  setTimeout(()=>m.classList.remove("show"), 2500);
+  showToast("Settings saved");
+});
+
+/* =========================================================
+   INIT
+   ========================================================= */
+let currentUser = readStoredUser();
+applyUser(currentUser);
+const startHash = (window.location.hash || "").replace("#","");
+showSection(TITLES[startHash] ? startHash : "overview", currentUser.name.split(" ")[0]);
 </script>
 </body>
 </html>
