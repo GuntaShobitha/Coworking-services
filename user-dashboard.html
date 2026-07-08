@@ -126,7 +126,7 @@
     </div>
   </aside>
 
-  <main class="dash-main">
+  <main class="dash-main" id="dashboard">
     <button class="dash-toggle" onclick="toggleSide()">☰</button>
     <div class="dash-topbar">
       <div>
@@ -146,6 +146,85 @@
         </div>
       </div>
     </div>
+
+    <div id="settingsPage" class="page" style="display:none;">
+    <div class="panel" style="max-width:720px;margin:auto;">
+        <h2>Preferences</h2>
+
+        <div class="rows">
+            <div class="r">
+                <div>
+                    <div class="name">Email notifications</div>
+                    <small>Weekly project updates</small>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" checked>
+                </label>
+            </div>
+
+            <div class="r">
+                <div>
+                    <div class="name">Push notifications</div>
+                    <small>Real-time alerts on your device</small>
+                </div>
+                <label class="switch">
+                    <input type="checkbox">
+                </label>
+            </div>
+
+            <div class="r">
+                <div>
+                    <div class="name">Two-factor authentication</div>
+                    <small>Add an extra layer of security</small>
+                </div>
+                <label class="switch">
+                    <input type="checkbox">
+                </label>
+            </div>
+
+            <div class="r">
+                <div>
+                    <div class="name">Language</div>
+                    <small>Interface language</small>
+                </div>
+
+                <select>
+                    <option>English</option>
+                    <option>Danish</option>
+                    <option>Japanese</option>
+                    <option>Spanish</option>
+                </select>
+            </div>
+
+            <div class="r">
+                <div>
+                    <div class="name">Theme</div>
+                    <small>Light or dark interface</small>
+                </div>
+
+                <select>
+                    <option>Light</option>
+                    <option>Dark</option>
+                    <option>System</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="panel" style="margin-top:20px;border-color:#f0d5c2;">
+            <h3 style="color:var(--warn)">Danger Zone</h3>
+
+            <button class="pill warn"
+                onclick="if(confirm('Really request account deletion?')) alert('Request sent to support.')">
+                Request Delete
+            </button>
+        </div>
+
+        <div style="margin-top:20px;">
+            <button class="btn ghost" onclick="closeSettings()">Back</button>
+            <button class="btn primary" onclick="saveSettings()">Save Changes</button>
+        </div>
+    </div>
+</div>
 
     <div id="content"></div>
   </main>
@@ -337,26 +416,72 @@ document.addEventListener("click",()=>{document.getElementById("menu").style.dis
 function logout(){
   try{ localStorage.removeItem("stackly.user"); localStorage.removeItem("stackly.token"); }catch(e){}
   showToast("Logged out");
-  setTimeout(()=>{ window.location.href = "/"; }, 500);
+  setTimeout(()=>{ window.location.href = "./"; }, 500);
 }
 
-function openSettings(){
-  document.getElementById("menu").style.display="none";
-  const host = document.getElementById("modalHost");
-  host.innerHTML = `
-    <div class="modal-bg" onclick="closeSettings()">
-      <div class="modal" onclick="event.stopPropagation()">
-        <header><h3>Settings</h3><button class="close" onclick="closeSettings()">×</button></header>
-        <div class="field"><label>Full name</label><input id="fName" value="${escapeHtml(user.name)}"/></div>
-        <div class="field"><label>Email</label><input id="fEmail" value="${escapeHtml(user.email)}"/></div>
-        <div class="actions">
-          <button class="btn ghost" onclick="closeSettings()">Cancel</button>
-          <button class="btn primary" onclick="saveSettings()">Save changes</button>
-        </div>
-      </div>
-    </div>`;
+// function openSettings(){
+//   document.getElementById("menu").style.display="none";
+//   const host = document.getElementById("modalHost");
+//   host.innerHTML = `
+//     <div class="modal-bg" onclick="closeSettings()">
+//       <div class="modal" onclick="event.stopPropagation()">
+//           <div class="panel" style="max-width:720px">
+//         <h3>Preferences</h3>
+//         <div class="rows">
+//           <div class="r"><div><div class="name">Email notifications</div><small>Weekly project updates</small></div><label class="switch"><input type="checkbox" checked></label></div>
+//           <div class="r"><div><div class="name">Push notifications</div><small>Real-time alerts on your device</small></div><label class="switch"><input type="checkbox"></label></div>
+//           <div class="r"><div><div class="name">Two-factor authentication</div><small>Add an extra layer of security</small></div><label class="switch"><input type="checkbox"></label></div>
+//           <div class="r"><div><div class="name">Language</div><small>Interface language</small></div>
+//             <select style="padding:8px 12px;border-radius:8px;border:1px solid var(--line);background:#fff"><option>English</option><option>Danish</option><option>Japanese</option><option>Spanish</option></select>
+//           </div>
+//           <div class="r"><div><div class="name">Theme</div><small>Light or dark interface</small></div>
+//             <select style="padding:8px 12px;border-radius:8px;border:1px solid var(--line);background:#fff"><option>Light</option><option>Dark</option><option>System</option></select>
+//           </div>
+//         </div>
+//       </div>
+
+//       <div class="panel" style="max-width:720px;margin-top:20px;border-color:#f0d5c2">
+//         <h3 style="color:var(--warn)">Danger zone</h3>
+//         <div class="rows">
+//           <div class="r"><div><div class="name">Delete account</div><small>Permanently remove your account. This cannot be undone.</small></div><button class="pill warn" onclick="if(confirm('Really request account deletion?'))alert('Request sent to support.')">Request</button></div>
+//         </div>
+//       </div>
+//           <button class="btn ghost" onclick="closeSettings()">Cancel</button>
+//           <button class="btn primary" onclick="saveSettings()">Save changes</button>
+//         </div>
+//       </div>
+//     </div>`;
+// }
+// function closeSettings(){ document.getElementById("modalHost").innerHTML=""; }
+
+
+function openSettings() {
+    document.getElementById("menu").style.display = "none";
+    document.getElementById("dashboard").style.display = "none";
+    document.getElementById("settingsPage").style.display = "block";
 }
-function closeSettings(){ document.getElementById("modalHost").innerHTML=""; }
+
+// function openSettings() {
+//     document.getElementById("menu").style.display = "none";
+
+//     // Hide dashboard/home
+//     document.getElementById("dashboard").style.display = "none";
+
+//     // Show settings page
+//     document.getElementById("settingsPage").style.display = "block";
+// }
+
+function closeSettings() {
+    document.getElementById("settingsPage").style.display = "none";
+    document.getElementById("dashboard").style.display = "block";
+}
+
+// function closeSettings() {
+//     document.getElementById("settingsPage").style.display = "none";
+//     document.getElementById("dashboard").style.display = "block";
+// }
+
+
 function saveSettings(){
   const n=document.getElementById("fName").value.trim()||user.name;
   const e=document.getElementById("fEmail").value.trim()||user.email;
@@ -364,6 +489,8 @@ function saveSettings(){
   try{ localStorage.setItem("stackly.user", JSON.stringify(user)); }catch(_){}
   closeSettings(); render(); showToast("Settings saved");
 }
+
+
 function escapeHtml(s){ return s.replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 
 let toastTimer;
