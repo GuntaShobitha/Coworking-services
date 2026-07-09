@@ -1440,8 +1440,9 @@
     function applyUser(u) {
       document.getElementById("sideName").textContent = u.name;
       document.getElementById("sideEmail").textContent = u.email;
-      document.getElementById("profName").textContent = u.name;
-      document.getElementById("profEmail").textContent = u.email;
+      const dashNameEl = document.getElementById("sidename-dashboard");
+      if (dashNameEl) dashNameEl.textContent = u.name;
+
       const img = document.getElementById("sideAvatarImg");
       if (u.avatar) { img.src = u.avatar; img.style.display = "block"; }
       else { img.style.display = "none"; document.getElementById("sideAvatar").textContent = initials(u.name); }
