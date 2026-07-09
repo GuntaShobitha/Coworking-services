@@ -588,7 +588,7 @@ function logout(){
     ["user","stackly.user","stackly.token","username","name","email","avatar"].forEach(k=>localStorage.removeItem(k));
   }catch(e){}
   showToast("Logged out");
-  setTimeout(()=>{ window.location.href = "/login.html"; }, 500);
+  setTimeout(()=>{ window.location.href = "./login.html"; }, 500);
 }
 
 /* ======= SETTINGS SAVE ======= */
