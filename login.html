@@ -37,7 +37,7 @@
           <option value="admin">Admin</option>
         </select>
       </div>
-      <div class="form-field"><label>Email</label><input type="email" required placeholder="you@email.com" /></div>
+      <div class="form-field"><label>Email</label><input id="email" type="email" required placeholder="you@email.com" /></div>
       <div class="form-field"><label>Password</label><input type="password" required placeholder="••••••••" /></div>
 
       <div class="form-actions">
@@ -89,5 +89,33 @@ function showRegister(e){ if(e) e.preventDefault(); hideAll(); document.getEleme
 function showForgot(e){ if(e) e.preventDefault(); hideAll(); document.getElementById('forgotForm').style.display='block'; }
 function showLogin(e){ if(e) e.preventDefault(); hideAll(); document.getElementById('loginForm').style.display='block'; }
 function hideAll(){ ['loginForm','registerForm','forgotForm'].forEach(id => document.getElementById(id).style.display='none'); }
+
+function handleLogin(e) {
+    e.preventDefault();
+
+    const role = document.getElementById("role").value;
+    const email = document.getElementById("email").value.trim();
+
+    if (!role) {
+        alert("Please select a role.");
+        return;
+    }
+
+    // Username = text before @
+    const username = email.split("@")[0];
+
+    // Store in localStorage
+    localStorage.setItem("email", email);
+    localStorage.setItem("username", username);
+    localStorage.setItem("role", role);
+
+    // Redirect
+    if (role === "admin") {
+        window.location.href = "./admin-dashboard.html";
+    } else {
+        window.location.href = "./user-dashboard.html";
+    }
+}
+
 </script>
 </body></html>

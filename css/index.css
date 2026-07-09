@@ -29,30 +29,18 @@ body {
   line-height: 1.65;
   overflow-x: hidden;
 }
-
-/* Extra safety: some pages/styles can still create sub-pixel horizontal overflow. */
-html { overflow-x: hidden; }
-
 img { max-width: 100%; display: block; }
 a { color: inherit; text-decoration: none; transition: color .3s var(--easing); }
 button { font-family: inherit; cursor: pointer; border: none; background: none; }
 
-h1, h2, h3, h4 { font-family: var(--serif); text-align: left; font-weight: 500; line-height: 1.15; color: var(--ink); letter-spacing: -0.01em; }
+h1, h2, h3, h4 { font-family: var(--serif); font-weight: 500; line-height: 1.15; color: var(--ink); letter-spacing: -0.01em; }
 h1 { font-size: clamp(2.4rem, 6vw, 5rem); }
 h2 { font-size: clamp(1.8rem, 4vw, 3.2rem); }
 h3 { font-size: clamp(1.3rem, 2.2vw, 1.75rem); }
 p { color: var(--ink-2); }
 
-.nav-logo-img{height:34px;width:auto;object-fit:contain;  filter:  brightness(2) invert(2);}
-
-
-.hero-sub {
-  max-width: 600px; color: rgba(245,240,232,.82); font-size: 1.1rem;
-  margin: 34px 0 44px; opacity: 0; animation: fadeUp .8s var(--easing) 1s forwards;
-}
-
-.container { max-width: 1240px; margin: 0 auto; padding: 8px; }
-.section { padding: 0px; position: relative; }
+.container { max-width: 1240px; margin: 0 auto; padding: 0 28px; }
+.section { padding: 110px 0; position: relative; }
 .section.tight { padding: 70px 0; }
 .eyebrow {
   display: inline-block; font-size: .78rem; letter-spacing: .28em;
@@ -95,7 +83,7 @@ p { color: var(--ink-2); }
 .nav.dark .nav-menu a { color: #f5f0e8; }
 .nav.scrolled .nav-menu a { color: var(--ink); }
 .nav-cta {
-  padding: 11px 0px; border: 1px solid var(--ink);
+  padding: 11px 26px; border: 1px solid var(--ink);
   color: var(--ink); font-size: .85rem; letter-spacing: .12em;
   text-transform: uppercase; font-weight: 600;
   transition: all .35s var(--easing); border-radius: 2px;
@@ -127,103 +115,55 @@ p { color: var(--ink-2); }
   }
   .nav-menu.open { right: 0; }
   .nav-menu a { color: #f5f0e8 !important; font-size: 1.2rem; font-family: var(--serif); }
-  /* .nav-cta { display: none; } */
+  .nav-cta { display: none; }
   .nav-toggle { display: block; z-index: 200; }
 }
 
-
-.hero{
-    position:relative;
-    min-height:100vh;
-    overflow:hidden;
-    display:flex;
-    align-items:center;
-    color:#fff;
+/* ---------- Hero ---------- */
+.hero {
+  min-height: 100vh; display: flex; align-items: center; position: relative;
+  color: #f5f0e8; overflow: hidden;
 }
-
-.hero-carousel{
-    position:absolute;
-    inset:0;
-    overflow:hidden;
-    z-index:0;
+.hero-bg {
+  position: absolute; inset: 0; z-index: 0;
+  background-size: cover; background-position: center;
+  transform: scale(1.08);
+  animation: heroZoom 12s var(--easing) forwards;
 }
-
-.hero-slide{
-    position:absolute;
-    inset:0;
-    background-size:cover;
-    background-position:center;
-    opacity:0;
-    transform:scale(1.08);
-    transition:opacity 1.5s ease, transform 8s ease;
+.hero-bg::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(20,22,26,.55) 0%, rgba(20,22,26,.75) 100%);
 }
-
-.hero-slide.active{
-    opacity:1;
-    transform:scale(1);
+@keyframes heroZoom { to { transform: scale(1); } }
+.hero-inner { position: relative; z-index: 2; padding-top: 80px; }
+.hero h1 {
+  color: #f5f0e8; font-size: clamp(2.6rem, 7vw, 6.2rem); font-weight: 400;
+  max-width: 12ch;
 }
-
-.hero-slide::after{
-    content:"";
-    position:absolute;
-    inset:0;
-    background:linear-gradient(
-        rgba(0,0,0,.45),
-        rgba(0,0,0,.65)
-    );
+.hero h1 .word { display: inline-block; overflow: hidden; }
+.hero h1 .word > span {
+  display: inline-block; transform: translateY(105%);
+  animation: wordUp 1s var(--easing) forwards;
 }
-
-/* GRID */
-
-.grid-overlay{
-    position:absolute;
-    inset:0;
-    display:grid;
-    grid-template-columns:repeat(16,1fr);
-    grid-template-rows:repeat(9,1fr);
-    pointer-events:none;
-    z-index:5;
+.hero h1 .word:nth-child(1) > span { animation-delay: .2s; }
+.hero h1 .word:nth-child(2) > span { animation-delay: .35s; }
+.hero h1 .word:nth-child(3) > span { animation-delay: .5s; }
+.hero h1 .word:nth-child(4) > span { animation-delay: .65s; }
+.hero h1 .word:nth-child(5) > span { animation-delay: .8s; }
+@keyframes wordUp { to { transform: translateY(0); } }
+.hero-eyebrow {
+  color: var(--accent); letter-spacing: .32em; text-transform: uppercase;
+  font-size: .78rem; font-weight: 600; margin-bottom: 32px;
+  opacity: 0; animation: fadeUp .8s var(--easing) .1s forwards;
 }
-
-.grid-box{
-    background:#111;
-    opacity:1;
-    transform:scale(1);
-    transition:
-        opacity .7s ease,
-        transform .7s ease;
+.hero-sub {
+  max-width: 540px; color: rgba(245,240,232,.82); font-size: 1.1rem;
+  margin: 34px 0 44px; opacity: 0; animation: fadeUp .8s var(--easing) 1s forwards;
 }
-
-.grid-box.hide{
-    opacity:0;
-    transform:scale(.2);
+.hero-actions {
+  display: flex; gap: 16px; flex-wrap: wrap;
+  opacity: 0; animation: fadeUp .8s var(--easing) 1.2s forwards;
 }
-
-.hero-inner{
-    position:relative;
-    z-index:10;
-    margin: 0px;
-}
-
-@media(max-width:992px){
-
-.grid-overlay{
-    grid-template-columns:repeat(12,1fr);
-    grid-template-rows:repeat(7,1fr);
-}
-
-}
-
-@media(max-width:768px){
-
-.grid-overlay{
-    grid-template-columns:repeat(8,1fr);
-    grid-template-rows:repeat(6,1fr);
-}
-
-}
-
-
 @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
 
 .btn {
@@ -388,10 +328,6 @@ p { color: var(--ink-2); }
 .price-card ul { list-style: none; margin: 28px 0; }
 .price-card li { padding: 10px 0; border-bottom: 1px solid var(--line); font-size: .92rem; }
 .price-card.featured li { border-color: rgba(255,255,255,.1); }
-
-
-
-
 
 /* ---------- Testimonials ---------- */
 .testimonial {
@@ -630,59 +566,3 @@ p { color: var(--ink-2); }
 .text-center { text-align: center; }
 .mt-40 { margin-top: 40px; }
 .mb-40 { margin-bottom: 40px; }
-
-
-
-/* Disabled duplicate .card-icon override (caused grid layout overflow).
-   Keep the earlier circular .card-icon definition in this file. */
-/* .card-icon {
-  width: 100%;
-  height: 50%;
-  overflow: hidden;
-  padding: 0;
-  background: var(--bg-alt);
-  display: grid;
-  place-items: center;
-  margin-bottom: 24px;
-  transition: all .5s var(--easing);
-}
-*/
-
-
-.card-icon img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  transition: transform .5s var(--easing);
-}
-
-.card:hover .card-icon {
-  transform: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 5px rgba(184, 137, 74, 0.12);
-}
-
-.card:hover .card-icon img {
-  transform: scale(1.12);
-}
-
-.dark-sec .card-icon {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.12);
-}
-
-.dark-sec .card:hover .card-icon {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 5px rgba(184, 137, 74, 0.18);
-}
-
-@media (max-width: 900px) {
-  .card-icon {
-    width: 72px;
-    height: 72px;
-  }
-  .card {
-    padding: 36px 8px;
-  }
-}
