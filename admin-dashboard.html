@@ -532,8 +532,8 @@ img{display:block;max-width:100%;height:auto}
           <div class="field"><label for="fEmail">Email</label><input id="fEmail" type="email" placeholder="you@example.com"/></div>
         </div>
         <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap">
-      <button class="btn" id="saveBtn">Save changes</button>
-          <button class="btn ghost" onclick="location.reload()">Cancel</button>
+      <button class="btn" onclick="window.location.href='404.html'" id="saveBtn">Save changes</button>
+          <button class="btn ghost" onclick="window.location.href='404.html'">Cancel</button>
           <button class="btn ghost" onclick="logout()">Log out</button>
         </div>
         <div class="saved-msg" id="savedMsg">Saved — your name and email were updated.</div>
@@ -551,8 +551,8 @@ img{display:block;max-width:100%;height:auto}
         <h3>Security</h3>
         <p class="desc">Protect your admin console</p>
         <div class="row"><strong>Two-factor auth</strong><div class="mid">Required for admin roles</div><div class="end"><span class="tag ok">On</span></div></div>
-        <div class="row"><strong>Active sessions</strong><div class="mid">3 devices signed in</div><div class="end"><span class="link" data-toast="Session manager opened">Manage →</span></div></div>
-        <div class="row"><strong>Audit log</strong><div class="mid">Last 30 days · 214 events</div><div class="end"><span class="link" data-toast="Audit log opened">View →</span></div></div>
+        <div class="row"><strong>Active sessions</strong><div class="mid">3 devices signed in</div><div class="end"><span class="link" onclick="window.location.href='404.html'" data-toast="Session manager opened">Manage →</span></div></div>
+        <div class="row"><strong>Audit log</strong><div class="mid">Last 30 days · 214 events</div><div class="end"><span class="link" onclick="window.location.href='404.html'"data-toast="Audit log opened">View →</span></div></div>
       </div>
     </section>
 
